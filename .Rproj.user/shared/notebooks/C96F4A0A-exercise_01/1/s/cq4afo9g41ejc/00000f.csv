@@ -1,0 +1,4 @@
+"0","ranks <- rank(murders$population)"
+"0","my_df <- data.frame(state=murders$state, ranks=ranks)"
+"0",""
+"0","my_df"
