@@ -1,8 +1,0 @@
-"0","temp <- c(35, 88, 42, 84, 81, 30)"
-"0","city <- c(""Beijing"", ""Lagos"", ""Paris"", ""Rio de Janeiro"", ""San Juan"", ""Toronto"")"
-"0",""
-"0","names(temp) <- city"
-"0",""
-"0","temp_F <- 5/9 * (temp-32)"
-"0",""
-"0",""
