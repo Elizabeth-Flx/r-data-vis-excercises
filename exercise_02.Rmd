@@ -178,6 +178,68 @@ ratings_dt[Book_Author %in% authors, .(COUNT = .N,
                                        AVR_RANK = mean(Book_Rating, rm.na=TRUE)),  by=Book_Author]
 ```
 
+# Section 4
+```{r}
+library(readxl)
+```
+
+1. Using the summer_olympic_medals.xlsx file, which athlete won most bronze medals? Hint read_excel()
+from readxl package.
+```{r}
+summer_olympics <- read_excel("./extdata/Lecture02_extdata/Exercise_data/summer_olympic_medals.xlsx", sheet="ALL MEDALISTS")
+summer_olympics <- as.data.table(summer_olympics)
+```
+
+```{r}
+summer_olympics[Medal=="Bronze", .N, by=Athlete][N==max(N)]
+```
+
+
+2. Are the columns Gender and Event_gender consistent? Find inconsistent gender entries.
+```{r}
+summer_olympics[substr(Gender,1,1) != Event_gender & Event_gender != 'X']
+```
+
+3. Which country won most medals? Which country has the highest ratio of silver medals? Use the data in
+the country summary sheet starting at row 147 of the summer_olympic_medals.xlsx file.
+```{r}
+summer_olympics[, .N, by="NOC"][N==max(N)]
+
+summer_olympics[, TOTAL_M := .N, by="NOC"]
+summer_olympics[Medal=="Bronze", BRONZE_M := .N, by="NOC"]
+summer_olympics[Medal=="Silver", SILVER_M := .N, by="NOC"]
+summer_olympics[Medal=="Gold", GOLD_M := .N, by="NOC"]
+
+unique(summer_olympics[, SILVER_M/TOTAL_M, by="NOC"][!is.na(V1)])[V1==max(V1)]
+```
+
+```{r}
+breakdown_dt <- as.data.table(read_excel("./extdata/Lecture02_extdata/Exercise_data/summer_olympic_medals.xlsx", sheet='BREAKDOWN', range="A3:G29"))
+breakdown_dt
+
+breakdown_dt[, S_Ratio := Silver/`Grand Total`, ]
+
+breakdown_dt[S_Ratio==max(S_Ratio)]
+```
+
+
+4. Which countries did participate, but without winning medals? Assume, that all countries listed in the
+IOC COUNTRY CODES sheet participated. Hint you can quick fix the column names with make.names
+and find set differences with setdiff.
+```{r}
+country_codes_dt <- as.data.table(read_excel("./extdata/Lecture02_extdata/Exercise_data/summer_olympic_medals.xlsx", sheet='IOC COUNTRY CODES 1'))
+
+all_codes <- country_codes_dt[,`Int Olympic Committee code`]
+#all_codes
+
+medal_codes <- summer_olympics[, unique(NOC)]
+#medal_codes
+
+diff <- setdiff(all_codes, medal_codes)
+diff
+
+country_codes_dt[`Int Olympic Committee code` %in% diff, Country...1]
+```
 
 
 
