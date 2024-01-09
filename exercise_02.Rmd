@@ -3,16 +3,126 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+library(data.table)
+library(magrittr)
+```
+# Section 1
+1
+```{r}
+ratings_dt <- fread("./extdata/Lecture02_extdata/Exercise_data/BX-Book-Ratings.csv")
+books_dt <- fread("./extdata/Lecture02_extdata/Exercise_data/BX-Books.csv")
+users_dt <- fread("./extdata/Lecture02_extdata/Exercise_data/BX-Users.csv")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+3
+```{r}
+users_dt$Age <- as.integer(users_dt[, Age])
+users_dt$Age[is.na(users_dt$Age)] <- 0
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+# Alternative
+# users_dt[, Age := as.numeric(Age)]
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```
+4 5
+```{r}
+summary(books_dt)
+sapply(users_dt, class)
+
+head(ratings_dt, n=5)
+tail(ratings_dt, n=5)
+```
+6
+```{r}
+colnames(ratings_dt) <- gsub('-', '_', colnames(ratings_dt))  
+colnames(books_dt) <- gsub('-', '_', colnames(books_dt))  
+colnames(users_dt) <- gsub('-', '_', colnames(users_dt))  
+```
+
+7
+```{r}
+books_dt[, c("Image_URL_S", "Image_URL_M", "Image_URL_L") := NULL]
+```
+
+8
+Create a table book_dt_2 that contains all the books published between 1900 and 2019 (inclusive) from
+the table books_dt.
+```{r}
+book_dt_2 <- books_dt[Year_Of_Publication >= 1900 & Year_Of_Publication <= 2019]
+```
+
+# Section 2
+1
+```{r}
+length(unique(books_dt[, Book_Author]))
+
+# Alternative
+books_dt[, uniqueN(Book_Author)]
+```
+
+2
+How many different authors are included for each year of publication between 2000 and 2010 (inclusive)
+in books_dt?
+```{r}
+books_dt[Year_Of_Publication >= 2000 & Year_Of_Publication <= 2010, uniqueN(Book_Author), by=Year_Of_Publication]
+```
+
+3
+In how many observations is the age information missing in the ratings table users_dt?
+```{r}
+users_dt[Age == 0, .N]
+```
+
+4
+What is the maximum rating value in the ratings table?
+```{r}
+max(unique(ratings_dt[, Book_Rating]))
+
+ratings_dt[, max(Book_Rating, rm.na=TRUE)]
+```
+
+5. What is the most common rating value larger than 0?
+```{r}
+ratings_dt[Book_Rating != 0, .N, by = Book_Rating][N==max(N)]
+```
+
+6. Which are the book identifiers (ISBN) with the highest ratings?
+```{r}
+ratings_dt[Book_Rating == 10, ISBN] %>% head
+
+ratings_dt[Book_Rating == max(Book_Rating, rm.na=TRUE), ISBN] %>% head
+```
+
+7. Reorder the ratings table according to the rating value of each book in descending order. Hint: order()
+```{r}
+ratings_dt[order(Book_Rating, decreasing = FALSE)]
+
+ratings_dt[order(-Book_Rating)]
+
+# setorder(ratings_dt, -Book_Rating)
+```
+
+# Section 3
+1. Add a new column called High_Rating to the data table ratings_dt. The column has an integer 1 for
+all observations with a rating value higher than 7. Hint: ifelse()
+```{r}
+
+```
+
+2. How many observations are considered to be a high ranking? What is the proportion of high ranked
+observations among all observations?
+3. Which users did not give any rating to any book? Filter these users out from users_dt. Hint: There’s no
+need to merge users_dt with ratings_dt, we are simply interested in the users that are not in ratings_dt.
+4. What is the most common age of users who rated at least one book?
+5. On average, how many books did a user rate?
+6. What is the title of the first published book with the highest ranking?
+7. In which year was a book with the largest number of ratings last published?
+8. Add to the table ratings_dt the highest ranking that each book received as a new column called
+Max_Book_Ranking.
+9. Subset the ratings_dt ratings table to contain only books written by the following authors:
+
+
+
+
+
+
