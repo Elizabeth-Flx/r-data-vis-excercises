@@ -239,6 +239,7 @@ diff <- setdiff(all_codes, medal_codes)
 diff
 
 country_codes_dt[`Int Olympic Committee code` %in% diff, Country...1]
+
 ```
 
 
