@@ -106,22 +106,77 @@ ratings_dt[order(-Book_Rating)]
 1. Add a new column called High_Rating to the data table ratings_dt. The column has an integer 1 for
 all observations with a rating value higher than 7. Hint: ifelse()
 ```{r}
+ratings_dt$High_Rating <- ifelse(ratings_dt[, Book_Rating] > 7, 1, 0)
 
+ratings_dt[, High_Rating := ifelse(Book_Rating > 7, 1, 0)]
 ```
 
 2. How many observations are considered to be a high ranking? What is the proportion of high ranked
 observations among all observations?
+```{r}
+ratings_dt[High_Rating == 1, .N]
+ratings_dt[High_Rating == 1, .N] / ratings_dt[, .N]
+
+ratings_dt[, sum(High_Rating)]
+ratings_dt[, sum(High_Rating)/.N]
+```
+
 3. Which users did not give any rating to any book? Filter these users out from users_dt. Hint: There’s no
 need to merge users_dt with ratings_dt, we are simply interested in the users that are not in ratings_dt.
+```{r}
+raters <- ratings_dt[,User_ID]
+raters
+users_dt[! User_ID %in% raters]
+```
+
 4. What is the most common age of users who rated at least one book?
+```{r}
+users_dt[User_ID %in% raters & Age != 0, .N, by=Age]
+users_dt[User_ID %in% raters & Age != 0, .N, by=Age][N==max(N)]
+```
+
 5. On average, how many books did a user rate?
+```{r}
+ratings_dt[, .N, by=User_ID][,sum(N)] / ratings_dt[, uniqueN(User_ID)]
+
+ratings_dt[, .N, by=User_ID][, mean(N, na.rm=TRUE)]
+```
+
 6. What is the title of the first published book with the highest ranking?
+```{r}
+ratings_dt[Book_Rating == max(Book_Rating) & Year_Of_Publication == min(Year_Of_Publication), Book_Title] %>% head(1)
+```
+
 7. In which year was a book with the largest number of ratings last published?
+```{r}
+ratings_dt[, N := .N, by=ISBN][N==max(N), Year_Of_Publication][1]
+
+ratings_dt[ISBN == ratings_dt[, .N, by=ISBN][N==max(N), ISBN] , Year_Of_Publication][1]
+```
+
 8. Add to the table ratings_dt the highest ranking that each book received as a new column called
 Max_Book_Ranking.
+```{r}
+ratings_dt[, Max_Book_Ranking := max(Book_Rating), by=ISBN]
+ratings_dt
+```
+
 9. Subset the ratings_dt ratings table to contain only books written by the following authors:
+```{r}
+authors <- c("Agatha Christie", "William Shakespeare", "Stephen King",
+"Ann M. Martin", "Carolyn Keene", "Francine Pascal",
+"Isaac Asimov", "Nora Roberts", "Barbara Cartland", "Charles Dickens")
+authors
 
+ratings_dt[Book_Author %in% authors]
+```
 
+10. How many ratings has each author from the previous exercise 9? What is their max and average ranking?
+```{r}
+ratings_dt[Book_Author %in% authors, .(COUNT = .N, 
+                                       MAX_RANK = max(Book_Rating, rm.na=TRUE), 
+                                       AVR_RANK = mean(Book_Rating, rm.na=TRUE)),  by=Book_Author]
+```
 
 
 
