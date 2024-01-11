@@ -1752,31 +1752,81 @@ display: none;
 
 
 <!-- rnb-text-begin -->
-<p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a>
-Notebook. When you execute code within the notebook, the results appear
-beneath the code.</p>
-<p>Try executing this chunk by clicking the <em>Run</em> button within
-the chunk or by placing your cursor inside it and pressing
-<em>Ctrl+Shift+Enter</em>.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGxvdChjYXJzKVxuYGBgIn0= -->
-<pre class="r"><code>plot(cars)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkYXRhLnRhYmxlKVxuYGBgIn0= -->
+<pre class="r"><code>library(data.table)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2Qgb3ZlcndyaXR0ZW4gYnkgJ2RhdGEudGFibGUnOlxuICBtZXRob2QgICAgICAgICAgIGZyb21cbiAgcHJpbnQuZGF0YS50YWJsZSAgICAgXG5kYXRhLnRhYmxlIDEuMTQuMTAgdXNpbmcgNCB0aHJlYWRzIChzZWUgP2dldERUdGhyZWFkcykuICBMYXRlc3QgbmV3czogci1kYXRhdGFibGUuY29tXG4ifQ== -->
+<pre><code>Registered S3 method overwritten by &#39;data.table&#39;:
+  method           from
+  print.data.table     
+data.table 1.14.10 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShtYWdyaXR0cilcbmxpYnJhcnkodGlkeXIpXG5gYGAifQ== -->
+<pre class="r"><code>library(magrittr)
+library(tidyr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYdGlkeXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTptYWdyaXR0cuKAmTpcblxuICAgIGV4dHJhY3RcbiJ9 -->
+<pre><code>
+Attaching package: ‘tidyr’
+
+The following object is masked from ‘package:magrittr’:
+
+    extract</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the
-toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and
-output will be saved alongside it (click the <em>Preview</em> button or
-press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the
-editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not
-run any R code chunks. Instead, the output of the chunk when it was last
-run in the editor is displayed.</p>
+<div id="section-1" class="section level1">
+<h1>Section 1</h1>
+<p>Hint: You can solve parts 1, 2 and 3 by looking at the printed
+output. You do not need to load the datasets.</p>
+<ol style="list-style-type: decimal">
+<li>Visually examine the dataset AirPassengers. Which of the following
+is true:</li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>AirPassengers is tidy data: it has one year for each row.</li>
+<li>AirPassengers is not tidy: we need at least one column with a
+character vector.</li>
+<li>AirPassengers is not tidy: it is a matrix instead of a data frame.
+&gt;d. AirPassengers is not tidy: to be tidy we would have to wrangle it
+to have three columns (year, month and value), then each passenger count
+would have a row.</li>
+</ol>
+<ol start="2" style="list-style-type: decimal">
+<li>Visually examine the dataset ChickWeight. Which of the following is
+true: ## weight Time Chick Diet ## 1 42 0 1 1 ## 2 51 2 1 1 ## 3 59 4 1
+1 ## 4 64 6 1 1 ## 5 76 8 1 1 ## 6 93 10 1 1</li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>ChickWeight is not tidy: each chick has more than one row.</li>
+<li>ChickWeight is tidy: each observation (a weight) is represented by
+one row. The chick from which this measurement came is one of the
+variables.</li>
+<li>ChickWeight is not tidy: we are missing the year column.</li>
+<li>ChickWeight is tidy: it is stored in a data frame.</li>
+</ol>
+<ol start="3" style="list-style-type: decimal">
+<li>Visually examine the dataset spanish_vowels. Is the data set tidy?
+## label rep frequency1 frequency2 ## 1: p01-male-a 1 615.4477 1230.806
+## 2: p01-male-a 2 644.6112 1281.965 ## 3: p01-male-a 3 607.9174
+1247.960 ## 4: p01-male-e 1 476.9079 1612.076 ## 5: p01-male-e 2
+457.2205 1839.456 ## — ## 746: p50-female-o 2 577.1894 1310.138 ## 747:
+p50-female-o 3 545.5014 1214.094 ## 748: p50-female-u 1 405.7645
+1491.935 ## 749: p50-female-u 2 458.0345 1141.513 ## 750: p50-female-u 3
+457.4308 1181.657</li>
+<li>The example_product_data.csv file describes the number of times a
+person bought product “a” and “b”. Load the file into a data.table.</li>
+<li>Transform product_dt into a long format using data.table
+commands.</li>
+<li>Transform the table from the long format back into a wide format.
+Check that it is equal to the original data.table.</li>
+</ol>
 <!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ3RybCtTaGlmdCtFbnRlciouIAoKYGBge3J9CnBsb3QoY2FycykKYGBgCgpBZGQgYSBuZXcgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpJbnNlcnQgQ2h1bmsqIGJ1dHRvbiBvbiB0aGUgdG9vbGJhciBvciBieSBwcmVzc2luZyAqQ3RybCtBbHQrSSouCgpXaGVuIHlvdSBzYXZlIHRoZSBub3RlYm9vaywgYW4gSFRNTCBmaWxlIGNvbnRhaW5pbmcgdGhlIGNvZGUgYW5kIG91dHB1dCB3aWxsIGJlIHNhdmVkIGFsb25nc2lkZSBpdCAoY2xpY2sgdGhlICpQcmV2aWV3KiBidXR0b24gb3IgcHJlc3MgKkN0cmwrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4KClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4K</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCmBgYHtyfQpsaWJyYXJ5KGRhdGEudGFibGUpCmxpYnJhcnkobWFncml0dHIpCmxpYnJhcnkodGlkeXIpCmBgYAoKIyBTZWN0aW9uIDEKCkhpbnQ6IFlvdSBjYW4gc29sdmUgcGFydHMgMSwgMiBhbmQgMyBieSBsb29raW5nIGF0IHRoZSBwcmludGVkIG91dHB1dC4gWW91IGRvIG5vdCBuZWVkIHRvIGxvYWQgdGhlIGRhdGFzZXRzLgoKMS4gVmlzdWFsbHkgZXhhbWluZSB0aGUgZGF0YXNldCBBaXJQYXNzZW5nZXJzLiBXaGljaCBvZiB0aGUgZm9sbG93aW5nIGlzIHRydWU6CmEuIEFpclBhc3NlbmdlcnMgaXMgdGlkeSBkYXRhOiBpdCBoYXMgb25lIHllYXIgZm9yIGVhY2ggcm93LgpiLiBBaXJQYXNzZW5nZXJzIGlzIG5vdCB0aWR5OiB3ZSBuZWVkIGF0IGxlYXN0IG9uZSBjb2x1bW4gd2l0aCBhIGNoYXJhY3RlciB2ZWN0b3IuCmMuIEFpclBhc3NlbmdlcnMgaXMgbm90IHRpZHk6IGl0IGlzIGEgbWF0cml4IGluc3RlYWQgb2YgYSBkYXRhIGZyYW1lLgo+ZC4gQWlyUGFzc2VuZ2VycyBpcyBub3QgdGlkeTogdG8gYmUgdGlkeSB3ZSB3b3VsZCBoYXZlIHRvIHdyYW5nbGUgaXQgdG8gaGF2ZSB0aHJlZSBjb2x1bW5zICh5ZWFyLCBtb250aAphbmQgdmFsdWUpLCB0aGVuIGVhY2ggcGFzc2VuZ2VyIGNvdW50IHdvdWxkIGhhdmUgYSByb3cuCgoyLiBWaXN1YWxseSBleGFtaW5lIHRoZSBkYXRhc2V0IENoaWNrV2VpZ2h0LiBXaGljaCBvZiB0aGUgZm9sbG93aW5nIGlzIHRydWU6CiMjIHdlaWdodCBUaW1lIENoaWNrIERpZXQKIyMgMSA0MiAwIDEgMQojIyAyIDUxIDIgMSAxCiMjIDMgNTkgNCAxIDEKIyMgNCA2NCA2IDEgMQojIyA1IDc2IDggMSAxCiMjIDYgOTMgMTAgMSAxCmEuIENoaWNrV2VpZ2h0IGlzIG5vdCB0aWR5OiBlYWNoIGNoaWNrIGhhcyBtb3JlIHRoYW4gb25lIHJvdy4KYi4gQ2hpY2tXZWlnaHQgaXMgdGlkeTogZWFjaCBvYnNlcnZhdGlvbiAoYSB3ZWlnaHQpIGlzIHJlcHJlc2VudGVkIGJ5IG9uZSByb3cuIFRoZSBjaGljayBmcm9tIHdoaWNoIHRoaXMKbWVhc3VyZW1lbnQgY2FtZSBpcyBvbmUgb2YgdGhlIHZhcmlhYmxlcy4KYy4gQ2hpY2tXZWlnaHQgaXMgbm90IHRpZHk6IHdlIGFyZSBtaXNzaW5nIHRoZSB5ZWFyIGNvbHVtbi4KZC4gQ2hpY2tXZWlnaHQgaXMgdGlkeTogaXQgaXMgc3RvcmVkIGluIGEgZGF0YSBmcmFtZS4KMy4gVmlzdWFsbHkgZXhhbWluZSB0aGUgZGF0YXNldCBzcGFuaXNoX3Zvd2Vscy4gSXMgdGhlIGRhdGEgc2V0IHRpZHk/CiMjIGxhYmVsIHJlcCBmcmVxdWVuY3kxIGZyZXF1ZW5jeTIKIyMgMTogcDAxLW1hbGUtYSAxIDYxNS40NDc3IDEyMzAuODA2CiMjIDI6IHAwMS1tYWxlLWEgMiA2NDQuNjExMiAxMjgxLjk2NQojIyAzOiBwMDEtbWFsZS1hIDMgNjA3LjkxNzQgMTI0Ny45NjAKIyMgNDogcDAxLW1hbGUtZSAxIDQ3Ni45MDc5IDE2MTIuMDc2CiMjIDU6IHAwMS1tYWxlLWUgMiA0NTcuMjIwNSAxODM5LjQ1NgojIyAtLS0KIyMgNzQ2OiBwNTAtZmVtYWxlLW8gMiA1NzcuMTg5NCAxMzEwLjEzOAojIyA3NDc6IHA1MC1mZW1hbGUtbyAzIDU0NS41MDE0IDEyMTQuMDk0CiMjIDc0ODogcDUwLWZlbWFsZS11IDEgNDA1Ljc2NDUgMTQ5MS45MzUKIyMgNzQ5OiBwNTAtZmVtYWxlLXUgMiA0NTguMDM0NSAxMTQxLjUxMwojIyA3NTA6IHA1MC1mZW1hbGUtdSAzIDQ1Ny40MzA4IDExODEuNjU3CjQuIFRoZSBleGFtcGxlX3Byb2R1Y3RfZGF0YS5jc3YgZmlsZSBkZXNjcmliZXMgdGhlIG51bWJlciBvZiB0aW1lcyBhIHBlcnNvbiBib3VnaHQgcHJvZHVjdCDigJxh4oCdIGFuZCDigJxi4oCdLgpMb2FkIHRoZSBmaWxlIGludG8gYSBkYXRhLnRhYmxlLgo1LiBUcmFuc2Zvcm0gcHJvZHVjdF9kdCBpbnRvIGEgbG9uZyBmb3JtYXQgdXNpbmcgZGF0YS50YWJsZSBjb21tYW5kcy4KNi4gVHJhbnNmb3JtIHRoZSB0YWJsZSBmcm9tIHRoZSBsb25nIGZvcm1hdCBiYWNrIGludG8gYSB3aWRlIGZvcm1hdC4gQ2hlY2sgdGhhdCBpdCBpcyBlcXVhbCB0byB0aGUgb3JpZ2luYWwKZGF0YS50YWJsZS4KCgoK</div>
 
 
 

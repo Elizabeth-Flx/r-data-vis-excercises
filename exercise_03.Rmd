@@ -3,16 +3,55 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+library(data.table)
+library(magrittr)
+library(tidyr)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+# Section 1
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+Hint: You can solve parts 1, 2 and 3 by looking at the printed output. You do not need to load the datasets.
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+1. Visually examine the dataset AirPassengers. Which of the following is true:
+a. AirPassengers is tidy data: it has one year for each row.
+b. AirPassengers is not tidy: we need at least one column with a character vector.
+c. AirPassengers is not tidy: it is a matrix instead of a data frame.
+>d. AirPassengers is not tidy: to be tidy we would have to wrangle it to have three columns (year, month
+and value), then each passenger count would have a row.
+
+2. Visually examine the dataset ChickWeight. Which of the following is true:
+## weight Time Chick Diet
+## 1 42 0 1 1
+## 2 51 2 1 1
+## 3 59 4 1 1
+## 4 64 6 1 1
+## 5 76 8 1 1
+## 6 93 10 1 1
+a. ChickWeight is not tidy: each chick has more than one row.
+b. ChickWeight is tidy: each observation (a weight) is represented by one row. The chick from which this
+measurement came is one of the variables.
+c. ChickWeight is not tidy: we are missing the year column.
+d. ChickWeight is tidy: it is stored in a data frame.
+3. Visually examine the dataset spanish_vowels. Is the data set tidy?
+## label rep frequency1 frequency2
+## 1: p01-male-a 1 615.4477 1230.806
+## 2: p01-male-a 2 644.6112 1281.965
+## 3: p01-male-a 3 607.9174 1247.960
+## 4: p01-male-e 1 476.9079 1612.076
+## 5: p01-male-e 2 457.2205 1839.456
+## ---
+## 746: p50-female-o 2 577.1894 1310.138
+## 747: p50-female-o 3 545.5014 1214.094
+## 748: p50-female-u 1 405.7645 1491.935
+## 749: p50-female-u 2 458.0345 1141.513
+## 750: p50-female-u 3 457.4308 1181.657
+4. The example_product_data.csv file describes the number of times a person bought product “a” and “b”.
+Load the file into a data.table.
+5. Transform product_dt into a long format using data.table commands.
+6. Transform the table from the long format back into a wide format. Check that it is equal to the original
+data.table.
+
+
+
