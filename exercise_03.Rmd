@@ -18,40 +18,201 @@ Hint: You can solve parts 1, 2 and 3 by looking at the printed output. You do no
 a. AirPassengers is tidy data: it has one year for each row.
 b. AirPassengers is not tidy: we need at least one column with a character vector.
 c. AirPassengers is not tidy: it is a matrix instead of a data frame.
->d. AirPassengers is not tidy: to be tidy we would have to wrangle it to have three columns (year, month
+-> d. AirPassengers is not tidy: to be tidy we would have to wrangle it to have three columns (year, month
 and value), then each passenger count would have a row.
 
 2. Visually examine the dataset ChickWeight. Which of the following is true:
-## weight Time Chick Diet
-## 1 42 0 1 1
-## 2 51 2 1 1
-## 3 59 4 1 1
-## 4 64 6 1 1
-## 5 76 8 1 1
-## 6 93 10 1 1
 a. ChickWeight is not tidy: each chick has more than one row.
-b. ChickWeight is tidy: each observation (a weight) is represented by one row. The chick from which this
+-> b. ChickWeight is tidy: each observation (a weight) is represented by one row. The chick from which this
 measurement came is one of the variables.
 c. ChickWeight is not tidy: we are missing the year column.
 d. ChickWeight is tidy: it is stored in a data frame.
+
 3. Visually examine the dataset spanish_vowels. Is the data set tidy?
-## label rep frequency1 frequency2
-## 1: p01-male-a 1 615.4477 1230.806
-## 2: p01-male-a 2 644.6112 1281.965
-## 3: p01-male-a 3 607.9174 1247.960
-## 4: p01-male-e 1 476.9079 1612.076
-## 5: p01-male-e 2 457.2205 1839.456
-## ---
-## 746: p50-female-o 2 577.1894 1310.138
-## 747: p50-female-o 3 545.5014 1214.094
-## 748: p50-female-u 1 405.7645 1491.935
-## 749: p50-female-u 2 458.0345 1141.513
-## 750: p50-female-u 3 457.4308 1181.657
+No Label can be split
+
 4. The example_product_data.csv file describes the number of times a person bought product “a” and “b”.
 Load the file into a data.table.
+```{r}
+product_dt <- fread("./extdata/example_product_data.csv")
+product_dt
+```
+
+
 5. Transform product_dt into a long format using data.table commands.
+```{r}
+long_dt <- melt(product_dt, id.vars = "name", measure.vars = c("producta", "productb"), variable.name = "product", value.name = "count")
+long_dt <- melt(product_dt, id.vars = "name", variable.name = "product", value.name = "count")
+long_dt
+```
+
 6. Transform the table from the long format back into a wide format. Check that it is equal to the original
 data.table.
+```{r}
+dcast(long_dt, ... ~ product, value.var = "count")
+```
 
+# Section 02 - Merge Warm Up
 
+Prepare two tables by running the following code:
+```{r}
+mtcars_dt <- as.data.table(mtcars)
+mtcars_dt[, carname := rownames(mtcars)]
+dt1 <- mtcars_dt[5:25,.(carname, mpg, cyl)]
+dt2 <- mtcars_dt[1:10, .(carname, gear)]
 
+dt1
+dt2
+```
+
+1. How many rows does the inner merge of dt1 and dt2 have? 6
+2. How many rows does the left merge of dt1 and dt2 have? 21
+3. How many rows does the outer merge of dt1 and dt2 have? 25
+
+```{r}
+merge(dt1, dt2, by = "carname")
+# or all = FALSE
+
+merge(dt1, dt2, by = "carname", all.x = TRUE)
+
+merge(dt1, dt2, by = "carname", all = TRUE)
+```
+
+# Section 03 - Weather dataset
+
+1. Read in the weather dataset weather.txt as a data.table. Please find this file on Moodle and save it to
+a folder called extdata in your working directory.
+```{r}
+weather_dt <- fread("./extdata/weather.txt")
+weather_dt
+```
+
+2. Why is this dataset messy?
+Different days are seperate col names
+Also many NA values
+3. How would a tidy version of it look like? Do not give the code, only describe how the tidy table would
+look like.
+Add another col called day and have it contain the value of the (1-31)
+
+4. Create a tidy version of the weather dataset.
+```{r}
+better_weather_dt <- na.omit(melt(weather_dt, id.vars = c("id", "year", "month", "element"), variable.name = "day", value.name = "temperature"))
+better_weather_dt
+
+better_weather_dt[, day:=substr(day, 2, length(day))]
+better_weather_dt
+
+better_weather_dt <- dcast(better_weather_dt, ... ~ element, value.var = "temperature")
+better_weather_dt
+
+better_weather_dt <- better_weather_dt[, .(id, day, month, year, TMAX, TMIN)]
+better_weather_dt
+
+# I feel this is not needed but it is done in the example
+better_weather_dt <- better_weather_dt[, .(id, date=paste(day, month, year, sep = "/"), TMAX, TMIN)]
+better_weather_dt
+```
+
+# Section 04 -Scattered data across many files
+
+The baby-names folder contains 258 csv-files (1999.girl.csv, 1999.boy.csv , . . . ) which store name
+frequencies for a particular year and sex.
+
+1. Create a list containing all file paths in the folder, i.e. (extdata/baby-names/1999.girl.csv,
+extdata/baby-names/1999.boys.csv, . . . ). Refer to Appendix A of the script if you are having trouble
+with the file paths.
+```{r}
+paths <- list()
+
+for(year in 1880:2008) {
+  paths <- append(paths, file.path("extdata", "baby-names", paste(year, ".boy.csv", sep = "") ))
+  paths <- append(paths, file.path("extdata", "baby-names", paste(year, ".girl.csv", sep = "") ))
+}
+
+# Better way of doing this
+paths <- list.files("extdata/baby-names", full.names=TRUE)
+paths
+```
+
+2. Name the list entries with the basename of the corresponding file path. The basename of a path is the
+actual name of the file, e.g. the basename of extdata/baby-names/1999.girl.csv is 1999.girl.csv.
+```{r}
+names(paths) <- basename(paths)
+paths
+```
+
+3. Read in the data from all files into one table. Hint: when you read many files and gather them into one
+table, be sure to add a column that identifies each file. rbindlist()
+```{r}
+tables <- lapply(paths, fread)
+
+baby_names_dt <- rbindlist(tables, use.names = TRUE, idcol = "file_name")
+baby_names_dt
+```
+
+4. Is the data tidy? If not, tidy it up.
+No, gender and year can be split
+```{r}
+baby_names_dt <- as.data.table(separate(baby_names_dt, col = "file_name", into = c("year", "gender"), extra = "drop"))
+baby_names_dt
+baby_names_dt[, gender:=ifelse(gender=="boy", "M", "F") ]
+baby_names_dt
+```
+# Section 05 - Small case-study: cleaning up a gene-expression dataset in yeast
+
+In this section, we will read and clean up the data from the paper:
+• Gagneur, Julien, et al. “Genotype-environment interactions reveal causal pathways that mediate genetic
+effects on phenotype.” PLoS Genet 9.9 (2013): e1003803. https://journals.plos.org/plosgenetics/artic
+le?id=10.1371/journal.pgen.1003803
+
+You will not need to understand the data in depth for this exercise but if you are interested you can find a
+detailed description in section 7.1 of the script.
+
+1. Read in the two files in the folder eqtl.
+The first file contains the genotypes of yeast strains and a strain identifyer. The second file contains
+information on how quickly each strain grows in different growth media.
+```{r}
+gt <- fread('extdata/eqtl/genotype.txt')
+dim(gt)
+head(gt[,1:5])
+gt
+```
+```{r}
+growth <- fread('extdata/eqtl/growth.txt')
+growth
+```
+
+2. Come up with a strategy, how you can transform the two tables shown above into the single table shown
+below.
+head(dt)
+## strain media growth_rate marker gt
+## 1: seg_01B YPD 12.60399 mrk_1 Lab strain
+## 2: seg_01B YPD 12.60399 mrk_14 Lab strain
+## 3: seg_01B YPD 12.60399 mrk_27 Lab strain
+## 4: seg_01B YPD 12.60399 mrk_40 Lab strain
+## 5: seg_01B YPD 12.60399 mrk_54 Lab strain
+## 6: seg_01B YPD 12.60399 mrk_67 Lab strain
+summary(dt)
+## strain media growth_rate marker
+## seg_01B: 5000 YPD :158000 Min. : 1.57 mrk_1 : 790
+## seg_01C: 5000 YPD_BPS :158000 1st Qu.: 4.55 mrk_14 : 790
+## seg_01D: 5000 YPD_Rapa:158000 Median : 6.93 mrk_27 : 790
+## seg_02B: 5000 YPE :158000 Mean : 7.60 mrk_40 : 790
+## seg_02C: 5000 YPMalt :158000 3rd Qu.:10.70 mrk_54 : 790
+## seg_02D: 5000 Max. :16.27 mrk_67 : 790
+## (Other):760000 NA's :42000 (Other):785260
+## gt
+## Lab strain :398145
+## Wild isolate:391855
+##
+##
+##
+5
+##
+##
+3. Write code that implements your strategy to transform the two tables into the one shown above.
+4. Spoiler: These are the things you can do with tidy data. When you are done run the following line of code
+and observe the result:
+library(ggplot2)
+ggplot(dt[marker %in% c('mrk_5211', 'mrk_1653')], aes(marker, growth_rate, color=gt)) +
+geom_boxplot() + facet_wrap(~media)
