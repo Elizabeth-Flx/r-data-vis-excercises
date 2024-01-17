@@ -221,11 +221,13 @@ merged_dt
 
 summary(merged_dt)
 ```
-
-
-3. Write code that implements your strategy to transform the two tables into the one shown above.
+3. Write code that implements your strategy to transform the two tables into the one shown above. (see above)
 4. Spoiler: These are the things you can do with tidy data. When you are done run the following line of code
 and observe the result:
+```{r}
 library(ggplot2)
+
+dt <- merged_dt
 ggplot(dt[marker %in% c('mrk_5211', 'mrk_1653')], aes(marker, growth_rate, color=gt)) +
 geom_boxplot() + facet_wrap(~media)
+```
