@@ -1,4 +1,4 @@
-Section 00 - Getting ready
+# Section 00 - Getting ready
 1. Make sure you have already installed and loaded the following libraries:
 ```{r}
 library(ggplot2)
@@ -7,3 +7,34 @@ library(magrittr) # Needed for %>% operator
 library(tidyr)
 library(ggrepel)
 ```
+
+# Section 01 - Plot types
+Match each chart type with the relationship it shows best.
+1. shows distribution and quantiles, especially useful when comparing uni-modal distributions.
+boxplot
+
+2. highlights individual values, supports comparison and can show rankings or deviations categories and totals
+bar chart
+
+3. shows overall changes and patterns, usually over intervals of time
+line chart
+
+4. shows relationship between two continuous variables.
+scatterplot
+
+Options: bar chart, line chart, scatterplot, boxplot
+
+# Section 02 - Reproducing a plot with ggplot2
+1. Reproduce the following visualization of the association between the variables cty and hwy for the years
+1999 and 2008 from the dataset mpg using the library ggplot2:
+```{r}
+data(mpg)
+mpg <- as.data.table(mpg)
+
+mpg[, year:=as.factor(year)]
+
+ggplot(data=mpg, aes(x=cty, y=hwy, color=year)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+
