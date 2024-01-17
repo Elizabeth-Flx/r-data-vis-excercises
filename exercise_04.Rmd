@@ -155,7 +155,47 @@ ggplot(data = iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
 ```
 
 
+# Section 05 - Axes scaling and text labeling
 
+1. Load the medals dataset stored in the file medals.csv. Plot the total number of medals won against
+population size in the 2016 Rio Olympics with a scatter plot. You can load the dataset with the following
+code:
+```{r}
+medals_dt <- fread('extdata/medals.csv')
+medals_dt
+
+ggplot(data=medals_dt, aes(x=population, y=total, label=code)) +
+  geom_point()
+
+# x axis diffictult to read (need to log)
+```
+
+2. What are the problems with the previous plot? Solve these issues with an adapted version of the plot.
+```{r}
+ggplot(data=medals_dt, aes(x=population, y=total, label=code)) +
+  geom_point() + 
+  scale_x_log10() +
+  scale_y_log10() +
+  annotation_logticks()
+```
+
+3. Add the country labels to the points in the scatter plot. Compare the differences of using the library
+ggplot2 and the library ggrepel for this task
+```{r}
+ggplot(data=medals_dt, aes(x=population, y=total, label=code)) +
+  geom_point() + 
+  scale_x_log10() +
+  scale_y_log10() +
+  annotation_logticks() +
+  geom_text()
+
+ggplot(data=medals_dt, aes(x=population, y=total, label=code)) +
+  geom_point() + 
+  scale_x_log10() +
+  scale_y_log10() +
+  annotation_logticks() +
+  geom_text_repel()
+```
 
 
 
