@@ -38,3 +38,96 @@ ggplot(data=mpg, aes(x=cty, y=hwy, color=year)) +
   geom_smooth(method="lm")
 ```
 
+# Section 03 - Visualizing distributions
+
+Iris is a classical dataset in machine learning literature. It was first introduced by R.A. Fisher in his 1936
+paper. The dataset gives the measurements in centimeters of the variables sepal length and width and petal
+length and width, respectively, for 50 flowers from each of 3 species of iris.
+
+1. Load the iris data and transform it to a data.table. Have a look at its first and last rows.
+```{r}
+data(iris)
+iris
+
+head(iris)
+tail(iris)
+```
+
+
+2. How are the lengths and widths of sepals and petals distributed? Make one plot of the distributions
+with multiple facets. Hint: You will need to reshape your data so that the different measurements (petal
+length, sepal length, etc.) are in one column and the values in another. Remember which is the best plot
+for visualizing distributions.
+```{r}
+iris_long_dt <- melt(as.data.table(iris), id.vars = "Species", variable.name = "type", value.name = "length")
+iris_long_dt
+
+ggplot(data=iris_long_dt, aes(length)) + 
+  geom_histogram() +
+  facet_wrap(facets = "type")
+```
+
+
+3. Vary the number of bins in the created histogram. Describe what you see.
+```{r}
+# with too many its difficult to see the distributions
+ggplot(data=iris_long_dt, aes(length)) + 
+  geom_histogram(bins = 100) +
+  facet_wrap(facets = "type")
+
+# with too few we would miss bimodal distribution in petal width
+ggplot(data=iris_long_dt, aes(length)) + 
+  geom_histogram(bins = 5) +
+  facet_wrap(facets = "type")
+```
+
+4. Visualize the lengths and widths of the sepals and petals from the iris data with boxplots.
+```{r}
+ggplot(data=iris_long_dt, aes(length)) + 
+  geom_boxplot() +
+  facet_wrap(facets = "type")
+
+ggplot(data=iris_long_dt, aes(x=type, y=length)) +
+  geom_boxplot()
+```
+
+
+5. Add individual data points as dots on the boxplots to visualize all points. Discuss: in this case, why is it
+not good to visualize the data with boxplots? Hint: geom_jitter()
+
+We miss the bimodal distributions in petal length and petal width
+```{r}
+ggplot(data=iris_long_dt, aes(x=type, y=length)) +
+  geom_boxplot() +
+  geom_jitter(width = .2, height = .2)
+```
+
+
+6. Alternatives to boxplot are violin plots (geom_violin()). Try combining a boxplot with a violinplot to
+show the the lengths and widths of the sepals and petals from the iris data.
+```{r}
+ggplot(data=iris_long_dt, aes(x=type, y=length)) +
+  geom_violin() +
+  geom_boxplot(width=.05) 
+```
+
+
+
+7. Which pattern shows up when moving from boxplot to a violin plot? Investigate the dataset to explain
+this kind of pattern, provide with visualization.
+```{r}
+iris_long_dt
+
+ggplot(data=iris_long_dt, aes(x=Species, y=length)) + 
+  geom_jitter() +
+  facet_wrap(facets = "type")
+
+ggplot(data=iris_long_dt, aes(x=Species, y=length)) + 
+  geom_violin() +
+  facet_wrap(facets = "type")
+
+# This is the given solution (i think mine is better)
+ggplot(data=iris_long_dt, aes(x=type, y=length, color = Species)) +
+  geom_dotplot(binaxis="y", stackdir="centerwhole", dotsize=0.3)
+```
+
