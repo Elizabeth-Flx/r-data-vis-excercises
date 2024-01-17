@@ -131,3 +131,33 @@ ggplot(data=iris_long_dt, aes(x=type, y=length, color = Species)) +
   geom_dotplot(binaxis="y", stackdir="centerwhole", dotsize=0.3)
 ```
 
+# Section 04 - Visualizing relationships between continuous variables
+1. Are there any relationships/correlations between petal length and width? How would you visually show it?
+```{r}
+iris
+
+ggplot(data = iris, aes(x=Petal.Length, y=Petal.Width)) +
+  geom_point() + 
+  geom_smooth()
+
+ggplot(data = iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
+  geom_point() + 
+  geom_smooth()
+
+```
+
+2. Do petal lengths and widths correlate in every species? Show this with a plot.
+```{r}
+ggplot(data = iris, aes(x=Petal.Length, y=Petal.Width, color=Species)) +
+  geom_point() + 
+  geom_smooth(method = "lm") +
+  facet_wrap(facets = "Species", scales = "free")
+```
+
+
+
+
+
+
+
+
