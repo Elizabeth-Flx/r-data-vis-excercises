@@ -118,11 +118,11 @@ this kind of pattern, provide with visualization.
 ```{r}
 iris_long_dt
 
-ggplot(data=iris_long_dt, aes(x=Species, y=length)) + 
+ggplot(data=iris_long_dt, aes(x=Species, y=length, color=Species)) + 
   geom_jitter() +
   facet_wrap(facets = "type")
 
-ggplot(data=iris_long_dt, aes(x=Species, y=length)) + 
+ggplot(data=iris_long_dt, aes(x=Species, y=length, color=Species)) + 
   geom_violin() +
   facet_wrap(facets = "type")
 
