@@ -204,12 +204,25 @@ summary(dt)
 ## gt
 ## Lab strain :398145
 ## Wild isolate:391855
-##
-##
-##
-5
-##
-##
+
+```{r}
+growth_long_dt <- melt(growth, id.vars = c("strain"), variable.name = "media", value.name = "growth_rate")
+growth_long_dt
+
+gt_long_dt <- melt(gt, id.vars = c("strain"), variable.name = "marker", value.name = "gt")
+gt_long_dt
+
+merged_dt <- merge(growth_long_dt, gt_long_dt, by = "strain", allow.cartesian = TRUE)
+merged_dt
+
+merged_dt[,strain:=as.factor(strain)]
+merged_dt[,gt:=as.factor(gt)]
+merged_dt
+
+summary(merged_dt)
+```
+
+
 3. Write code that implements your strategy to transform the two tables into the one shown above.
 4. Spoiler: These are the things you can do with tidy data. When you are done run the following line of code
 and observe the result:
