@@ -197,7 +197,75 @@ ggplot(data=medals_dt, aes(x=population, y=total, label=code)) +
   geom_text_repel()
 ```
 
+# Section 06 - The importance of data visualization
 
+Anscombe’s quartet was constructed in 1973 by the statistician Francis Anscombe to demonstrate both the
+importance of graphing data before analyzing it, and the effect of outliers on statistical properties. anscombe
+is directly built in R. You do not need to download it.
+
+1. We reshaped the original anscombe data to anscombe_reshaped. Which one is tidier? (reshaped)
+```{r}
+anscombe_reshaped <- anscombe %>%
+as.data.table %>%
+.[, ID := seq(nrow(.))] %>%
+melt(id.var=c("ID")) %>%
+separate(variable, c('xy', "group"), sep=1) %>%
+as.data.table %>%
+dcast(... ~ xy) %>%
+.[, group := paste0("dataset_", group)]
+
+anscombe
+anscombe_reshaped[]
+```
+
+2. Compute the mean and standard deviation of each variable for each group. What do you see?
+```{r}
+anscombe_reshaped[,.(x_mean=mean(x), x_std=sd(x), y_mean=mean(y), y_std=sd(y)), by=group]
+```
+
+3. For each dataset, what is the Pearson correlation between x and y? Hint: cor() and Wikipedia1 for
+Pearson correlation.
+```{r}
+anscombe_reshaped[, .(pcc=cor(x,y)), by=group]
+```
+
+
+4. Only by computing statistics, we could conclude that all 4 datasets have the same data. Now, plot x and
+y for each dataset and discuss.
+```{r}
+ggplot(data=anscombe_reshaped, aes(x,y, color=group)) +
+  geom_point() +
+  facet_wrap(facets = "group")
+```
+
+
+5. Consider now the datasets given in the file boxplots.csv. Load the data and visualize the different
+datasets with a boxplot. What do you observe? What can you conclude?
+```{r}
+boxplots_dt <- fread("./extdata/boxplots.csv")
+boxplots_dt
+
+boxplots_long_dt <- melt(boxplots_dt, variable.name = "group", value.name = "value")
+boxplots_long_dt
+
+summary(boxplots_long_dt)
+
+ggplot(boxplots_long_dt, aes(value, color=group)) +
+  geom_boxplot() +
+  facet_wrap(facets = "group")
+```
+
+
+6. Exchange the boxplots by violin plots in the previous exercise. What do you observe? Do you conclude
+the same as you did when visualizing the datasets with the boxplots
+```{r}
+ggplot(boxplots_long_dt, aes(group, value, color=group)) +
+  geom_violin()
+
+ggplot(boxplots_long_dt, aes(group, value, color=group)) +
+  geom_violin() +
+  geom_point(alpha = 0.2, position=position_jitter(.3, .5))
+```
 
 
 
