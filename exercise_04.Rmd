@@ -267,5 +267,40 @@ ggplot(boxplots_long_dt, aes(group, value, color=group)) +
   geom_point(alpha = 0.2, position=position_jitter(.3, .5))
 ```
 
+# Section 07 - Understanding and recreating boxplots
+
+1. Using the mtcars dataset, make a boxplot of the miles per gallon (mpg) per cylinder (cyl).
+```{r}
+mtcars_dt
+
+mtcars_dt[,cyl:=as.factor(cyl)]
+
+ggplot(mtcars_dt, aes(cyl, mpg)) +
+  geom_boxplot() 
+```
+
+2. Now, recreate the same plot without using geom_boxplot. You have to add all the layers manually: IQR
+box, median line, whiskers and outlier points. Hint: Remember how a boxplot is constructed2. You may
+find these functions useful: IQR, geom_crossbar, geom_segment, geom_point. Use data.table commands.
+```{r}
+mtcars_dt[, c("q1", "median", "q3") := as.list(quantile(x=mpg, probs = c(.25, .5, .75))), by = cyl] 
+
+mtcars_dt[, iqr := q3-q1]
+mtcars_dt[, out_min := q1-iqr*1.5]
+mtcars_dt[, out_max := q3+iqr*1.5]
+
+mtcars_dt[, is_outlier:=(mpg < out_min | mpg > out_max)]
+
+mtcars_dt
+mtcars_dt
+
+ggplot(mtcars_dt, aes(cyl, median, ymin=q1, ymax=q3)) +
+  geom_crossbar() +
+  geom_segment(aes(cyl, q3, xend = cyl, yend = out_max)) +
+  geom_segment(aes(cyl, out_min, xend = cyl, yend = q1)) +
+  geom_point(data=mtcars_dt[is_outlier==TRUE], aes(cyl, mpg))
+```
+
+
 
 
