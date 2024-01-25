@@ -1,0 +1,99 @@
+Section 00 - Getting ready
+1. Make sure you have already installed and loaded the following libraries:
+```{r}
+library(ggplot2)
+library(data.table)
+library(magrittr) # Needed for %>% operator
+library(tidyr)
+library(GGally)
+library(pheatmap)
+library(mclust)
+```
+
+
+# Section 01 - Visualizing multiple variables
+In this exercise, we will revisit how to do a correlation analysis and potential pitfalls of correlation analysis.
+We will use the gene expression data in cancer_data.rds which stores the expression of 20 genes across 30
+different tumor samples. Gene expression measures the abundance of RNAs per gene and is indicative of how
+active a gene is in a sample. If the expression of a gene differs a lot between conditions (e.g. healthy versus
+cancer or different cancer types) it could hint that this gene plays an important role in this context.
+Load the gene expression data in cancer_data.rds as a data.table with the following line of code:
+```{r}
+expr <- readRDS("extdata/cancer_data.rds") %>% as.data.table(keep.rownames="tumor_type")
+expr
+```
+## tumor_type MYC SRM GBE1 FUK UGP2
+## 1: DOHH2 -0.4950154 0.20907327 -0.4366726 100.0000000 100.0000000
+## 2: FARAGE -0.4913630 -0.35590874 0.5322076 0.1037538 -0.6494896
+## 3: HT -0.4559935 -0.23852493 0.6714241 -1.0136358 -0.9651291
+## 4: Kapas231 1.6152666 0.92666297 1.0168147 -0.9978958 1.0064845
+## 5: OCI-LY1 0.4942733 2.40062582 -1.4255166 1.0676067 0.9862178
+## 6: OCI-LY1-B50 0.1940777 -0.04941387 -0.4810955 0.2423189 0.7046970
+
+1. We are interested in the correlations between genes. Plot the pairwise correlations of the variables in the
+dataset. Which pair of genes has the highest correlation? Hint: remember that you can exclude a column
+"colA" from a data table DT with DT[, -"colA"].
+```{r}
+gene_cor <- cor(expr[, -"tumor_type"])
+pheatmap(gene_cor)
+
+# alternative
+ggcorr(expr[, -"tumor_type"]) 
+```
+
+2. Visualize the raw data in a heatmap with pheatmap. Hint: pheatmap does not work well with data.tables,
+you should therefore convert it to a matrix before plotting with as.matrix()
+```{r}
+expr_mat <- as.matrix(expr[, -"tumor_type"])
+rownames(expr_mat) <- expr[, tumor_type]
+
+pheatmap(expr_mat)
+```
+
+3. Does the latter plot suggest some outliers? Could they have affected the correlations? Check by using an
+appropriate plot the impact of these outliers on the correlations in question 1. Substitute them with missing
+values (NA) and redo the previous questions 1 and 2.
+```{r}
+expr_long <- melt(expr, id.vars = "tumor_type", variable.name = "gene", value.name = "expression")
+expr_long[order(-expression),]
+
+ggplot(expr, aes(FUK, UGP2)) +
+  geom_point()
+
+expr[tumor_type=="DOHH2", "FUK"] <- NA
+expr[tumor_type=="DOHH2", "UGP2"] <- NA
+expr
+```
+
+```{r}
+gene_cor <- cor(expr[, -"tumor_type"], use="complete.obs")
+pheatmap(gene_cor)
+
+# alternative
+ggcorr(expr[, -"tumor_type"]) 
+
+
+expr_mat <- as.matrix(expr[, -"tumor_type"])
+rownames(expr_mat) <- expr[, tumor_type]
+
+pheatmap(expr_mat)
+```
+
+# Section 02 - Heatmaps and Hierarchical clustering
+1. Consider the full iris data set without the Species column for clustering. Create a pretty heatmap with
+the library pheatmap of the data without clustering.
+2. Now, create a pretty heatmap using complete linkage clustering of the rows of the data set. Hint: You
+can specify a clustering method with the clustering_method argument in pheatmap
+3. Obtain the dendrogram of the row clustering using complete linkage clustering and partition the data
+into 3 clusters. Hint: You can use cutree for cutting the tree.
+4. Annotate the rows of the heatmap with the Species column of the iris dataset and the three clusters
+from complete linkage clustering. What do you observe when you compare the clustering and the species
+labels?
+
+
+
+
+
+
+
+
