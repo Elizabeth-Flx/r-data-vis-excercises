@@ -82,13 +82,47 @@ pheatmap(expr_mat)
 # Section 02 - Heatmaps and Hierarchical clustering
 1. Consider the full iris data set without the Species column for clustering. Create a pretty heatmap with
 the library pheatmap of the data without clustering.
+```{r}
+data(iris)
+
+iris
+iris$Species = NULL
+
+iris_mat <- as.matrix(iris)
+
+pheatmap(iris_mat, cluster_rows = FALSE, cluster_cols = FALSE, scale = "column", labels_row = 0)
+```
+
 2. Now, create a pretty heatmap using complete linkage clustering of the rows of the data set. Hint: You
 can specify a clustering method with the clustering_method argument in pheatmap
+```{r}
+pheatmap(iris_mat, cluster_rows = TRUE, cluster_cols = TRUE, clustering_method = "complete", scale = "column")
+```
+
 3. Obtain the dendrogram of the row clustering using complete linkage clustering and partition the data
 into 3 clusters. Hint: You can use cutree for cutting the tree.
+```{r}
+heatmap <- pheatmap(iris_mat, cluster_rows = TRUE, cluster_cols = TRUE, clustering_method = "complete", scale = "column")
+
+trees <- cutree(heatmap$tree_row, k = 3)
+```
+
 4. Annotate the rows of the heatmap with the Species column of the iris dataset and the three clusters
 from complete linkage clustering. What do you observe when you compare the clustering and the species
 labels?
+```{r}
+data(iris)
+
+annotation <- data.frame( complete = paste0("T",trees),
+                       species = iris$Species)
+rownames(annotation) <- rownames(iris)
+
+rownames(iris_mat) <- rownames(iris)
+
+pheatmap(iris_mat, cluster_rows = T, cluster_cols = T, clustering_method = "complete", scale = "column", annotation_row = annotation, show_rownames = F)
+```
+
+
 
 
 
