@@ -128,6 +128,75 @@ algorithms. You can solve this exercise with pen and paper.
 
 11/15 ~= 0.73
 
+# Section 04 - Clustering and Heatmaps
+In this section, we aim to compare two different clustering algorithms - hierarchical clustering and k-means
+clustering.
+1. This plot represents a random initialization of a k-means algorithm with k=2. X1, X2 are the randomly
+positioned centroids and A to E are the points of the 2-dimensional dataset. Calculate the new positions
+of the centroids after the first iteration using the euclidean distance. Hint: You can solve this exercise
+either with pen and paper or using R.
+```{r}
+# X1 6 9
+# X2 3 3
+
+points <- data.frame(x = c(08,10,04,05,06),
+                     y = c(05,07,06,08,04))
+rownames(points) <- c("A", "B", "C", "D", "E")
+points
+
+points <- as.data.table(points)
+
+points[, dist_x1 := sqrt((x-6)^2 + (y-9)^2)]
+points[, dist_x2 := sqrt((x-3)^2 + (y-3)^2)]
+points[, closer := ifelse(dist_x1 < dist_x2, "new_x1", "new_x2")]
+points
+
+points[, .(x=mean(x), y=mean(y)), by=closer]
+
+ggplot(points, aes(x,y, label=rownames(points))) + 
+  geom_point() +
+  geom_label()
+
+```
+
+
+2. Perform k-means clustering on the iris data set with k = 3.
+```{r}
+data(iris)
+iris_mat <- as.matrix(iris[, 1:4])
+
+iris_mat_scaled <- scale(iris_mat)
+
+kmeans_cluster <- kmeans(iris_mat_scaled, 3, nstart=100) 
+kmeans_cluster$cluster
+```
+
+3. Reproduce section 2 from the tutorial. Use the table function to compare the partitions from the complete
+linkage and k-means clustering.
+```{r}
+heatmap <- pheatmap(iris_mat, cluster_rows = TRUE, cluster_cols = TRUE, clustering_method = "complete", scale = "column")
+complete_link_clusters <- cutree(heatmap$tree_row, k = 3)
+
+table(complete_link_clusters, kmeans_cluster$cluster)
+```
+
+4. Create a pretty heatmap using complete clustering of the rows annotated with the species and both
+clustering results - complete linkage clustering and the k-means clustering. What do you observe when you
+compare the two different clustering algorithms and the species labels?
+```{r}
+data(iris)
+
+annot <- data.frame(species = iris$Species,
+                    complete_link = complete_link_clusters,
+                    kmeans = kmeans_cluster$cluster)
+rownames(annot) <- rownames(iris)
+
+rownames(iris_mat) <- rownames(iris)
+
+pheatmap(iris_mat, cluster_rows = T, cluster_cols = T, clustering_method = "complete", scale = "column", annotation_row = annot, show_rownames = F)
+```
+
+
 
 
 
