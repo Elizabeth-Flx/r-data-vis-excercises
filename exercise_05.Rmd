@@ -196,7 +196,32 @@ rownames(iris_mat) <- rownames(iris)
 pheatmap(iris_mat, cluster_rows = T, cluster_cols = T, clustering_method = "complete", scale = "column", annotation_row = annot, show_rownames = F)
 ```
 
+Section 05 - Cluster Comparison
+1. Compute the pairwise Rand indices between the clustering results from the previous sections (complete,
+average and k-means) and species label. Hint: rand.index() from the library fossil.
+```{r}
+library(fossil)
 
+annot$species_num <- as.numeric(annot$species)
+annot
+
+spec_comp <- rand.index(annot$species_num, annot$complete_link)
+spec_kmea <- rand.index(annot$species_num, annot$kmeans)
+comp_kmea <- rand.index(annot$complete_link, annot$kmeans)
+
+rands <- data.frame(species=c(1,spec_comp,spec_kmea),
+                    complete=c(spec_comp,1,comp_kmea),
+                    kmeans=c(spec_kmea, comp_kmea,1))
+rands <- as.matrix(rands)
+rownames(rands) <- c("species", "complete", "kmeans")
+```
+
+2. Visualize the pair wise Rand indices with a pretty heatmap. What is the best clustering in this scenario
+according to the computed Rand indices?
+```{r}
+pheatmap(rands, cluster_rows = F, cluster_cols = F)
+# kmeans is better
+```
 
 
 
