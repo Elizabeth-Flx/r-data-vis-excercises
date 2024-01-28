@@ -196,7 +196,7 @@ rownames(iris_mat) <- rownames(iris)
 pheatmap(iris_mat, cluster_rows = T, cluster_cols = T, clustering_method = "complete", scale = "column", annotation_row = annot, show_rownames = F)
 ```
 
-Section 05 - Cluster Comparison
+# Section 05 - Cluster Comparison
 1. Compute the pairwise Rand indices between the clustering results from the previous sections (complete,
 average and k-means) and species label. Hint: rand.index() from the library fossil.
 ```{r}
@@ -224,6 +224,97 @@ pheatmap(rands, cluster_rows = F, cluster_cols = F)
 ```
 
 
+# Section 06 - Dimensionality reduction with PCA
+1. Let X be the iris data set without the Species column and only for the species setosa. Perform PCA on
+X. Make sure that you scale and center the data before performing PCA.
+```{r}
+data(iris)
+
+iris_mat <- as.matrix(iris[iris$Species=="setosa", 1:4])
+
+# This makes the biplot look better
+rownames(iris_mat) <- rep("·", nrow(iris_mat))
+
+iris_pca <- prcomp(iris_mat, center=T, scale=T)
+iris_pca
+```
+
+
+2. Which proportion of the variance is explained by each principle component?
+```{r}
+summary(iris_pca)
+
+# 0.5146 0.2555 0.1670 0.06287
+```
+
+3. Compute the projection of X from the PCA result and plot the projection on the first two principle
+components. Hint: predict(). Additionally, look at the biplot and come up with an interpretation of the
+first principal component.
+```{r}
+projections <- predict(iris_pca)
+
+projections
+
+ggplot(as.data.frame(projections), aes(PC1, PC2)) +
+  geom_point()
+
+biplot(iris_pca)
+```
+based on the direction of the components (move away from pc1) -> negatively correlated to PC1
+
+
+4. Plot the first principal component against the other variables in the dataset and discuss whether this
+supports your previously stated interpretation.
+```{r}
+projections
+iris_mat
+
+components_df <- as.data.frame(cbind(iris_mat, projections))
+components_df <- components_df[, 1:5]
+
+components_dt <- melt(as.data.table(components_df), id.vars = "PC1", variable.name = "component")
+
+ggplot(components_dt, aes(value, PC1)) +
+  geom_point() +
+  facet_wrap(~component, scales = "free")
+```
+
+5. Repeat the steps 1 - 4 for all species jointly (not only setosa). Discuss whether your original interpretation
+of the first principal component changed when performing the PCA for all species jointly. Use color to
+differentiate between the species in your plots.
+```{r}
+data(iris)
+
+iris_mat <- as.matrix(iris[, 1:4])
+
+# This makes the biplot look better
+rownames(iris_mat) <- iris$Species
+
+iris_pca <- prcomp(iris_mat, center=T, scale=T)
+iris_pca
+
+projections <- predict(iris_pca)
+projections
+
+ggplot(as.data.frame(projections), aes(PC1, PC2, color=rownames(projections))) +
+  geom_point()
+
+#looks terrible
+#biplot(iris_pca)
+
+projections
+iris_mat
+
+components_df <- as.data.frame(cbind(iris_mat, projections))
+components_df <- components_df[, 1:5]
+components_df$species <- iris$Species
+
+components_dt <- melt(as.data.table(components_df), id.vars = c("PC1","species"), variable.name = "component")
+components_dt
+ggplot(components_dt, aes(value, PC1, color=species)) +
+  geom_point() +
+  facet_wrap(~component, scales = "free")
+```
 
 
 
