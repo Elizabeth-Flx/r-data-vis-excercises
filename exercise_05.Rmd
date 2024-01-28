@@ -122,7 +122,11 @@ rownames(iris_mat) <- rownames(iris)
 pheatmap(iris_mat, cluster_rows = T, cluster_cols = T, clustering_method = "complete", scale = "column", annotation_row = annotation, show_rownames = F)
 ```
 
+# Section 03 - Cluster comparison
+1. Compute the Rand index between the two following clustering results from two different clustering
+algorithms. You can solve this exercise with pen and paper.
 
+11/15 ~= 0.73
 
 
 
