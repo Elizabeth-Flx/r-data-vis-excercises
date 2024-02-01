@@ -1,0 +1,39 @@
+# Section 00 - Getting ready
+1. Make sure you have already installed and loaded the following libraries:
+```{r}
+library(ggplot2)
+library(data.table)
+library(magrittr) # Needed for %>% operator
+library(tidyr)
+```
+
+# Section 01 - Color guidelines
+What are best practices when using color for data visualizations? Select all that apply.
+1. Avoid having too many colors for categorical data. x
+2. Use color only when it actually adds meaning to the plot. x
+3. Use divergent color scales for categorical data types.
+
+# Section 02 - Correlation and Causation
+Read the following statements. Decide for each statement separately whether it is true or false and give an
+explanation.
+1. The concept of reverse causality states that whenever A causes B, B also causes A. FALSE
+2. If A causes B and A causes C, then B also causes C. FALSE
+3. If A and B correlate and A happens before B, then A causes B. FALSE
+4. Causation implies linear association. FALSE
+
+# Section 03 - Effect of a third variable
+Investigate the file coffee_sim.csv (simulated dataset) by first loading it as a data.table.
+```{r}
+coffee_dt <- fread("./extdata/coffee_sim.csv")
+coffee_dt
+summary(coffee_dt)
+```
+1. Suggest an appropriate visualization and implement it with ggplot2 to display a possible association
+between coffee consumption and “datavizitis” disease risk, measured in deaths per 1000 individuals. Does
+this plot by itself seem consistent with a causal effect of coffee on datavizitis?
+2. Investigate the full dataset. Do you see evidence for a third variable influencing association? Support your
+statement with an appropriate plot. Draw a graph with the potential causal relationships you find consistent
+with the data. Relate it to one of the situations from the lecture script’s figure 6.3 or Simpson’s paradox.
+
+
+
