@@ -71,3 +71,54 @@ smoking -> coffee
 
 # Section 04 - General guidelines in data visualization
 Below is a graph taken from one published paper. Read the figure legend.
+In biology, a wild type strain (WT) is a strain whose genome has not been artificially modified. In contrast,
+a mutant is a strain whose genome has been artificially modified.
+1. Discuss in groups what could be better representations. Use pen and paper. There can be many options.
+
+- box plot
+- different color for WT and Mutants
+- color for below and above WT
+
+2. Implement the solution proposed by the tutor.
+```{r}
+# simulate data
+dt <- data.table(pro_uptake = c(rnorm(3, 10100, 300), rnorm(4, 12100, 300),
+rnorm(3, 9850, 300), rnorm(4, 11100, 300),
+rnorm(4,8300, 300), rnorm(3,10050, 300),
+rnorm(3, 12000, 300), rnorm(3, 10020, 300),
+rnorm(3, 10080, 300), rnorm(3, 10070, 300) ),
+mutants = c(rep("WT",3), rep("T49A",4), rep("K227N",3), rep("A400V",4),
+rep("L421P",4), rep("I500T",3), rep("N591D",3),
+rep("A601T",3), rep("E684D",3), rep("G710R",3) ) )
+
+dt
+```
+```{r}
+means <- aggregate(pro_uptake ~ mutants, dt, mean)
+means
+
+dt[, mean := mean(pro_uptake), by=mutants]
+
+wt_mean <- dt[mutants=="WT", mean][1]
+wt_mean
+
+dt[, color:=ifelse(mean == wt_mean, "grey", ifelse(mean > wt_mean, "red", "blue"))]
+dt
+
+#ggplot(dt, aes(mutants, pro_uptake)) +
+#  stat_summary(fun=mean, colour="darkred", geom="point", 
+#               shape=18, size=3, show.legend=FALSE) + 
+#  geom_point()
+
+level_order <- dt[order(mean), unique(mutants)]
+level_order
+
+ggplot(dt, aes(factor(mutants, level=level_order), pro_uptake, color=color)) +
+  geom_boxplot() +
+  geom_point(color="black") +
+  xlab("mutant") +
+  ylab("proline uptake")
+
+```
+
+
