@@ -122,3 +122,34 @@ ggplot(dt, aes(factor(mutants, level=level_order), pro_uptake, color=color)) +
 ```
 
 
+# Section 05 - Covid19 fatality rate in Belgium
+Consider the following dataset which contains the fatality rate (percentage of deaths among infected) by
+COVID 19 of different age groups in Belgium in June 2020 (taken from De Smet, D. (2020). Is corona erger
+dan de griep? De Standaard, 22 June 2020). The overall rate (all_ages) suggests that being a female
+increases the risk of dying from COVID-19 upon infection. Using appropriate plots discuss the validity of
+this hypothesis and draw a graph with the potential causal relationships you find consistent with the data.
+Relate it to one of the situations from the lecture script’s figure 6.3 or Simpson’s paradox.
+```{r}
+fatality_dt <- fread('extdata/belgium_infection_fatality_rate_june2020.csv')
+fatality_dt
+
+fatality_long_dt <- melt(fatality_dt, id.vars = "age_group", variable.name = "gender", value.name = "death_rate")
+fatality_long_dt
+
+ggplot(fatality_long_dt[age_group!="All ages"], aes(age_group, death_rate, fill=gender)) +
+  geom_col(position="dodge") +
+  geom_text(aes(label=death_rate), position=position_dodge(width=0.9), vjust=-0.25) 
+```
+Simpsons paradox
+There are more older women in Belgium, because older people are more susceptible to dying
+
+two factors show certain association, when stratifying by third variable, The association changes direction
+
+sex -> age
+age -> death_rate
+sex -> death_rate
+
+
+
+
+
