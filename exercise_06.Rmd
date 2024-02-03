@@ -180,6 +180,11 @@ ggplot(datavizitis_smoking_dt, aes(cigarettes_per_day, datavizitis_severity)) +
 ggplot(datavizitis_smoking_dt, aes(cigarettes_per_day, datavizitis_severity, color=hospitalized)) +
   geom_point() +
   geom_smooth(method="lm")
+
+ggplot(datavizitis_smoking_dt, aes(cigarettes_per_day, datavizitis_severity)) +
+  geom_point(aes(color=hospitalized)) +
+  geom_smooth(aes(color=hospitalized), method="lm") +
+  geom_smooth(method="lm")
 ```
 
 4. Recent studies have looked at hospitalized patients who tested positive for Covid19 and their smoking
