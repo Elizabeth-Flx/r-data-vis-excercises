@@ -31,9 +31,43 @@ summary(coffee_dt)
 1. Suggest an appropriate visualization and implement it with ggplot2 to display a possible association
 between coffee consumption and “datavizitis” disease risk, measured in deaths per 1000 individuals. Does
 this plot by itself seem consistent with a causal effect of coffee on datavizitis?
+```{r}
+coffee_dt[,packs_cigarettes_per_day := as.factor(packs_cigarettes_per_day)]
+coffee_dt[,coffee_cups_per_day := as.factor(coffee_cups_per_day)]
+
+ggplot(coffee_dt, aes(coffee_cups_per_day, datavizitis_risk)) +
+  geom_boxplot()
+
+```
 2. Investigate the full dataset. Do you see evidence for a third variable influencing association? Support your
 statement with an appropriate plot. Draw a graph with the potential causal relationships you find consistent
 with the data. Relate it to one of the situations from the lecture script’s figure 6.3 or Simpson’s paradox.
+```{r}
+ggplot(coffee_dt, aes(packs_cigarettes_per_day, datavizitis_risk)) +
+  geom_boxplot()
+
+ggplot(coffee_dt, aes(coffee_cups_per_day, datavizitis_risk, color=packs_cigarettes_per_day)) +
+  geom_boxplot()
 
 
+ggplot(coffee_dt, aes(packs_cigarettes_per_day, datavizitis_risk, color=coffee_cups_per_day)) +
+  geom_boxplot()
 
+
+ggplot(coffee_dt, aes(coffee_cups_per_day, datavizitis_risk)) +
+  geom_boxplot() +
+  facet_wrap(~packs_cigarettes_per_day)
+
+
+ggplot(coffee_dt, aes(packs_cigarettes_per_day, datavizitis_risk)) +
+  geom_boxplot() +
+  facet_wrap(~coffee_cups_per_day)
+
+```
+common cause
+smoking -> datavisitis
+smoking -> coffee
+
+
+# Section 04 - General guidelines in data visualization
+Below is a graph taken from one published paper. Read the figure legend.
