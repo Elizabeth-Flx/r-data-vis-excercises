@@ -150,6 +150,57 @@ age -> death_rate
 sex -> death_rate
 
 
+# Section 06 - Smoking and Datavizitis severity
+Consider the following dataset contains a population of 2000 individuals who got datavizitis. It consists of
+the number of cigaretes each individual smokes per day, the severity of their datavizitis and if they were
+hospitalized or not.
+```{r}
+datavizitis_smoking_dt <- fread("./extdata/datavizitis_smoking.csv")
+datavizitis_smoking_dt
+```
+1. Visualize the relationship between the number of cigarettes smoked per day and datavizitis severity among
+hospitalized individuals. Make use of geom_smooth(method="lm") to highlight the general trend.
+```{r}
+ggplot(datavizitis_smoking_dt[hospitalized=="Yes"], aes(cigarettes_per_day, datavizitis_severity)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
 
 
+2. Visualize the relationship between datavizitis severity and cigarettes smoked per day among all population.
+Make use of geom_smooth(method="lm") to highlight the general trend.
+```{r}
+ggplot(datavizitis_smoking_dt, aes(cigarettes_per_day, datavizitis_severity)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+
+3. Visualize the same relationship distinguishing between hospitalized and all individuals.
+```{r}
+ggplot(datavizitis_smoking_dt, aes(cigarettes_per_day, datavizitis_severity, color=hospitalized)) +
+  geom_point() +
+  geom_smooth(method="lm")
+```
+
+4. Recent studies have looked at hospitalized patients who tested positive for Covid19 and their smoking
+status. They propose smoking may provide a lower risk of developing severe Covid19 based on a negative
+association between Covid19 severity and smoking status. Considering the previous results on datavizitis can
+you come up with a different explanation? Draw a graph with the potential causal relationships you find
+consistent with the data. Relate it to one of the situations from the lecture script’s figure 6.3 or Simpson’s
+paradox.
+```{r}
+ggplot(datavizitis_smoking_dt, aes(hospitalized, cigarettes_per_day)) +
+  geom_boxplot()
+
+ggplot(datavizitis_smoking_dt, aes(hospitalized, datavizitis_severity)) +
+  geom_boxplot()
+```
+
+because we subset by hospitalization. People are more likely to be hospitalized if they either smoke a lot 
+or have a high severity of datavisitis (or both).
+This can lead to a seemingly negative association between smoking and datavisitis when subsetting by hospitalization
+
+common consequence
+cigarettes -> hospitalization
+datavisitis_sev -> hospitalization
 
