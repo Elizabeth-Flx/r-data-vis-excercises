@@ -209,3 +209,91 @@ common consequence
 cigarettes -> hospitalization
 datavisitis_sev -> hospitalization
 
+
+
+# Section 07 - Supporting hypotheses with visualizations
+
+1. Read the titanic.csv file into a data.table. You can read the description of the dataset on kaggle:
+https://www.kaggle.com/c/titanic/data.
+```{r}
+titanic_dt <- fread("./extdata/titanic.csv")
+titanic_dt
+```
+
+2. Inspect the data table and make a summary of the variables in the dataset. What is the overall passenger
+survival rate?
+```{r}
+summary(titanic_dt)
+
+titanic_dt[survived==1, .N] / titanic_dt[, .N]
+titanic_dt[, mean(survived)]
+
+```
+
+3. Does age associate with survival? Make a plot showing the distribution of age per survival outcome.
+```{r}
+#titanic_dt[, .N , by=c("age", "survived")]
+
+ggplot(titanic_dt, aes(age)) +
+  geom_histogram() +
+  facet_wrap(~survived)
+
+ggplot(titanic_dt, aes(factor(survived), age)) +
+  geom_violin()
+
+ggplot(titanic_dt, aes(factor(survived), age)) +
+  geom_boxplot() +
+  geom_jitter(height=.1, weight=.1)
+```
+
+4. Visualize the relationship between passenger class and survival rate.
+```{r}
+ggplot(titanic_dt, aes(factor(survived), pclass)) +
+  geom_jitter()
+
+ggplot(titanic_dt[, .N, by=c("pclass", "survived")], aes(pclass, N, fill=factor(survived))) +
+  geom_col(position = "dodge")
+
+ggplot(titanic_dt[, .N, by=c("pclass", "survived")], aes(pclass, N, fill=factor(survived))) +
+  geom_col(position = "fill")
+
+ggplot(titanic_dt[, .(survival_rate = mean(survived)), by=pclass], aes(pclass, survival_rate)) +
+  geom_col()
+
+
+```
+
+5. How is age distributed in each passenger class?
+```{r}
+ggplot(titanic_dt, aes(age, fill=factor(pclass))) +
+  geom_histogram() +
+  facet_wrap(~pclass)
+
+ggplot(titanic_dt, aes(age, fill=factor(pclass))) +
+  geom_histogram(aes(y=..density..)) +
+  geom_density(alpha=0) +
+  facet_wrap(~pclass)
+
+ggplot(titanic_dt, aes(factor(pclass), age, color=factor(pclass))) + 
+  geom_violin() +
+  geom_boxplot(width=0.1)
+
+ggplot(titanic_dt, aes(factor(pclass), age, color=factor(pclass))) + 
+  geom_boxplot()
+```
+
+
+6. Considering the passenger class, do age and survival outcome associate? Given the findings on question 4,
+comment on the results. Draw a graph with the potential causal relationships you find consistent with the
+data. Relate it to one of the situations from the lecture script’s figure 6.3 or Simpson’s paradox.
+```{r}
+ggplot(titanic_dt, aes(factor(survived), age)) +
+  geom_boxplot() +
+  facet_wrap(~pclass)
+
+
+```
+indirect cause
+age -> passenger class -> survival
+
+
