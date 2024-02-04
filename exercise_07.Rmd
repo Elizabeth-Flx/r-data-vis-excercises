@@ -130,6 +130,69 @@ p_val_links(mks_geno, N_permu=10000)
 ```
 
 
+# Section 03 - Controlling for a 3rd variable
+1. We found that marker 5211 and marker 5091 are associated with growth. However, we also found that
+both markers are associated with each other. Thus, the association of one of these markers with growth could
+be explained away by the association of the other one with growth.
+Now, we would like to know if marker 5091 still associates with growth in maltose (YPMalt) when conditioned
+on marker 5211. Define a null hypothesis, a statistic and use permutation testing to answer the question.
+Strengthen your answer with a relevant plot.
+
+marker 5091 no longer associates with growth, when conditioned by marker 5211
+
+```{r}
+growth_mrk <- merge(growth, genotype[marker == "mrk_5091", .(strain, genotype, marker)], 
+                    by = 'strain', allow.cartesian = TRUE)
+growth_mrk <- merge(growth_mrk, genotype[marker == "mrk_5211", .(strain, genotype, marker)], 
+                    by = 'strain', suffixes = c("_5091", "_5211"), allow.cartesian = TRUE)
+growth_mrk <- growth_mrk[media=="YPMalt"]
+growth_mrk
+
+facet_names <- list(
+  'Lab strain'="Lab strain 5211",
+  'Wild isolate'="Wild isolate 5211"
+)
+facet_labeller <- function(variable,value){
+  facet_names[value]
+}
+
+ggplot(growth_mrk, aes(genotype_5091, growth_rate)) +
+  geom_boxplot() +
+  facet_wrap(~genotype_5211, labeller = facet_labeller) 
+
+p_val_medians(growth_mrk[genotype_5211=="Lab strain", .(growth_rate, genotype=genotype_5091)] )
+p_val_medians(growth_mrk[genotype_5211=="Wild isolate", .(growth_rate, genotype=genotype_5091)] )
+```
+
+2. Now, test if marker 5211 associates with growth in maltose when conditioned on marker 5091. Are the
+results the same? Discuss.
+
+marker 5211 association with growth persists, even when conditioned on marker 5091
+
+```{r}
+growth_mrk <- merge(growth, genotype[marker == "mrk_5211", .(strain, genotype, marker)], 
+                    by = 'strain', allow.cartesian = TRUE)
+growth_mrk <- merge(growth_mrk, genotype[marker == "mrk_5091", .(strain, genotype, marker)], 
+                    by = 'strain', suffixes = c("_5211", "_5091"), allow.cartesian = TRUE)
+growth_mrk <- growth_mrk[media=="YPMalt"]
+growth_mrk
+
+facet_names <- list(
+  'Lab strain'="Lab strain 5091",
+  'Wild isolate'="Wild isolate 5091"
+)
+facet_labeller <- function(variable,value){
+  facet_names[value]
+}
+
+ggplot(growth_mrk, aes(genotype_5211, growth_rate)) +
+  geom_boxplot() +
+  facet_wrap(~genotype_5091, labeller = facet_labeller) 
+
+p_val_medians(growth_mrk[genotype_5091=="Lab strain", .(growth_rate, genotype=genotype_5211)] )
+p_val_medians(growth_mrk[genotype_5091=="Wild isolate", .(growth_rate, genotype=genotype_5211)] )
+```
+
 
 
 
