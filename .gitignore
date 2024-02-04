@@ -2,4 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-./extdata/
+extdata/
+*.nb.html
+*.Rproj
