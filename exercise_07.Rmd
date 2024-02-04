@@ -86,6 +86,50 @@ mrk_5091 statistically associated with growth
 
 
 
+# Section 02 - Permutation test of marker association
+1. We just concluded that both markers 5211 and 5091 are significantly associated with growth. However,
+this could be confounded. A common source of confounding in genomics is due to “linkage”, which describes
+the phenomenon of markers being inherited together. A biological explanation for linkage is provided
+here: https://www.khanacademy.org/science/biology/classical- genetics/chromosomal- basis- of -
+genetics/a/linkage-mapping
+To investigate the issue of linkage in our dataset, test if marker 5091 significantly associates with marker
+5211. Define a null hypothesis, a statistic and use permutation testing to answer the question. Strengthen
+your answer with a relevant plot.
+Hint: start from the table below and think about how this can be permuted.
+```{r}
+mks_geno <- dcast(genotype[marker %in% c("mrk_5091", "mrk_5211")], ...~marker)
+mks_geno
+```
+```{r}
+get_links <- function(dt){
+  dt[mrk_5091==mrk_5211, .N]
+}
+get_links(mks_geno)
+
+
+p_val_links <- function(dt, N_permu=1000) {
+  T_ref <- get_links(dt)
+  T_star <- sapply(1:N_permu, function(x) {
+    get_links(dt[, .(mrk_5211=sample(mrk_5211), mrk_5091=sample(mrk_5091))])
+  })
+  
+  g <- ggplot(data.table(T_star=T_star), aes(T_star)) +
+    geom_histogram() +
+    geom_vline(aes(xintercept=T_ref, color="T_ref"))
+  
+  print(g)
+  
+  p_val_right <- (sum(T_star >= T_ref) + 1) / (N_permu + 1)
+  p_val_left  <- (sum(T_star <= T_ref) + 1) / (N_permu + 1)
+  
+  p_val <- 2 * min(p_val_right, p_val_left)
+  return(p_val)
+}
+
+p_val_links(mks_geno, N_permu=10000)
+```
+
+
 
 
 
