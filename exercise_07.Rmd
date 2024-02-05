@@ -194,5 +194,40 @@ p_val_medians(growth_mrk[genotype_5091=="Wild isolate", .(growth_rate, genotype=
 ```
 
 
+# Section 04 - Confidence Intervals
+1. Estimate 95% equi-tailed confidence intervals for the difference of the medians of growth in maltose for each
+genotype at marker mrk_5211. Use the case resampling bootstrap scheme and report bootstrap percentile
+intervals. Propose a visualization of the results. Try it also with markers 5091 and 1653.
+
+marker 5211
+```{r}
+generate_conf_interval <- function(marker, n=100) {
+  
+  maltose_dt <- getMaltoseDt(marker)
+  observed_median_diff <- median_diff(maltose_dt)
+  
+  T_bootstrap <- rep(NA, n)
+  
+  for (i in 1:n) {
+    dt_boot <- maltose_dt[sample(nrow(dt), replace=T)]
+    T_bootstrap[i] <- median_diff(dt_boot)
+  }
+  
+  conf_interval <- quantile(T_bootstrap, c(0.025, 0.975))
+  
+  print(conf_interval)
+  
+  p <- ggplot(data.table(medians=T_bootstrap), aes(medians)) +
+    geom_histogram() +
+    geom_vline(aes(xintercept=observed_median_diff, color="observed")) +
+    geom_vline(aes(xintercept=conf_interval[1], color="conf_interval")) +
+    geom_vline(aes(xintercept=conf_interval[2], color="conf_interval"))
+  print(p)
+}
+
+generate_conf_interval("mrk_5211", n=1000)
+generate_conf_interval("mrk_5091", n=1000)
+generate_conf_interval("mrk_1653", n=1000)
+```
 
 
