@@ -20,3 +20,32 @@ value.name = 'growth_rate')
 marker <- fread("./extdata/eqtl/marker.txt")
 ```
 
+# Section 01 - Warm Up: Choosing the right test
+1. You are a data science consultant helping researchers pick the right tests to evaluate their hypotheses. For
+each hypothesis, indicate which test from the ones you have seen in the lecture would be most appropriate:
+
+a) A researcher collects data on the height (measured in cm) and weight (measured in g) of Germans.
+She hypothesizes that there is a significant association between how tall Germans are and how much
+they weigh. She would like to test this hypothesis without making any distributional assumptions.
+spearman correlation
+
+b) A researcher collects data on the weight (measured in g) of Bavarians before and after the Oktoberfest.
+She would like to know whether there is a significant difference in average weight after the Oktoberfest
+as compared to before it. Prior research indicates that the weight of Bavarians is approximately
+normally distributed.
+t-test (/welch or wilcox)
+
+c) A researcher is evaluating a rapid antigen test. The company manufacturing the test claims that if
+someone is infected, the test will correctly return a positive result 99% of the time. The researcher
+hypothesizes that, in practice, the test is often improperly administered and therefore significantly less
+sensitive. She asks 1000 individuals, which have all been confirmed to be infected by a PCR test, to
+self-administer the antigen test. She records how often the antigen test correctly returns a positive
+result.
+binomial test p=0.99 as null hypothesis
+
+d) The company manufacturing the test has collected a bigger dataset, comprising both infected and
+non-infected individuals. For each individual, they record two datapoints: the result of a PCR test
+(infected/not-infected), which is taken as ground truth, and the result of a self-administered antigen
+test (positive/negative). They would like to show that, even if self-administered, the test still gives
+some information about infection status and thus is better than nothing.
+fischer exact test
