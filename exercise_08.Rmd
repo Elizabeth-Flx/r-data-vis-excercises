@@ -1,0 +1,22 @@
+Section 00 - Getting Ready
+1. Make sure you have already installed and loaded the following libraries:
+```{r}
+library(ggplot2)
+library(data.table)
+library(magrittr)
+library(tidyr)
+library(dplyr)
+library(datasets)
+```
+2. Load yeast data and required packages using the following code:
+```{r}
+gene <- fread("./extdata/eqtl/gene.txt")
+genotype <- fread("./extdata/eqtl/genotype.txt")
+genotype <- melt(genotype, id.vars = 'strain', variable.name = 'marker',
+value.name = 'genotype')
+growth <- fread("./extdata/eqtl/growth.txt")
+growth <- melt(growth, id.vars = "strain", variable.name = 'media',
+value.name = 'growth_rate')
+marker <- fread("./extdata/eqtl/marker.txt")
+```
+
