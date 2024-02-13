@@ -33,7 +33,7 @@ b) A researcher collects data on the weight (measured in g) of Bavarians before 
 She would like to know whether there is a significant difference in average weight after the Oktoberfest
 as compared to before it. Prior research indicates that the weight of Bavarians is approximately
 normally distributed.
-t-test (/welch or wilcox)
+t-test (/welch or wilcoxon)
 
 c) A researcher is evaluating a rapid antigen test. The company manufacturing the test claims that if
 someone is infected, the test will correctly return a positive result 99% of the time. The researcher
@@ -49,3 +49,69 @@ non-infected individuals. For each individual, they record two datapoints: the r
 test (positive/negative). They would like to show that, even if self-administered, the test still gives
 some information about infection status and thus is better than nothing.
 fischer exact test
+
+
+
+Section 02 - Test the association between markers and growth
+1. Reproduce the growth boxplot for marker 5211 using the following code:
+```{r}
+getMaltoseDt <- function(mrk){
+growth_mrk <- merge(growth, genotype[marker == mrk, .(strain, genotype)],
+by = 'strain')
+growth_mrk[media == "YPMalt"]
+}
+# boxplot
+plot_growth_one_mk <- function(mk){
+ggplot(getMaltoseDt(mk), aes(genotype, growth_rate)) +
+geom_boxplot() +
+labs(title = mk) + theme_bw(base_size = 16) +
+theme(plot.title = element_text(hjust = 0.5))
+}
+plot_growth_one_mk("mrk_5211")
+```
+
+2. Last week, using permutation, we saw that some markers associated with growth. Which of the statistical
+tests from the lecture would you use to test this association? For each marker, we are not certain if the
+genotype will cause a positive or negative effect on growth; therefore, which kind of alternative hypothesis
+would you choose: double-sided, right or left? Apply the test to marker 5211 to obtain a p-value and see if
+the association that we found last week still holds. If more than one of the tests are appropriate, use them
+all and compare the results.
+double-sided
+```{r}
+data <- getMaltoseDt("mrk_5211")
+
+t.test(growth_rate ~ genotype, data = data, alternative="two.sided")
+wilcox.test(growth_rate ~ genotype, data = data, alternative="two.sided")
+
+```
+
+3. Given a marker and the name of a statistical test, make a function that returns the p-value of the
+association of that marker with respect to growth. You can use the template below to construct this
+function. Then test your function on the markers 1653 and 5091. Since we used the same markers last week:
+do you get similar results as last week?
+```{r}
+test_growth <- function(mk, test){
+  m_dt <- getMaltoseDt(mk)
+  if(test == 'wilcoxon') {
+    pval <- t.test(growth_rate ~ genotype, data=m_dt, alternative="two.sided")$p.value
+  } else {
+    pval <- wilcox.test(growth_rate ~ genotype, data=m_dt, alternative="two.sided")$p.value  
+  }
+  return(pval)
+}
+
+test_growth("mrk_1653", 'wilcoxon')
+test_growth("mrk_1653", '')
+test_growth("mrk_5091", 'wilcoxon')
+test_growth("mrk_5091", '')
+
+```
+
+
+
+# Section 03 - Correlations and correlation tests
+1. Investigate the correlation between Sepal.Length and Sepal.Width within the iris dataset. Calculate
+the correlation and plot your results. Are there any issues with your results? Discuss.
+2. Repeat the previous analysis for each species independently. How does the correlation between
+Sepal.Length and Sepal.Width change?
+
