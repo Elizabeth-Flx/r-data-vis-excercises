@@ -112,6 +112,43 @@ test_growth("mrk_5091", '')
 # Section 03 - Correlations and correlation tests
 1. Investigate the correlation between Sepal.Length and Sepal.Width within the iris dataset. Calculate
 the correlation and plot your results. Are there any issues with your results? Discuss.
+```{r}
+data(iris)
+
+iris_dt <- as.data.table(iris)
+
+cor.test(iris_dt[,Sepal.Length], iris_dt[,Sepal.Width], method="pearson")
+cor.test(iris_dt[,Sepal.Length], iris_dt[,Sepal.Width], method="spearman")
+
+ggplot(iris_dt, aes(Sepal.Length, Sepal.Width)) +
+  geom_point() +
+  geom_smooth(method=lm) +
+  geom_smooth()
+
+```
+
 2. Repeat the previous analysis for each species independently. How does the correlation between
 Sepal.Length and Sepal.Width change?
+```{r}
+
+ggplot(iris_dt, aes(Sepal.Length, Sepal.Width, color=Species)) +
+  geom_point() +
+  facet_wrap(~Species) +
+  geom_smooth(method=lm) +
+  geom_smooth()
+
+cor.test(iris_dt[Species=="setosa",Sepal.Length], iris_dt[Species=="setosa",Sepal.Width], method="pearson")
+cor.test(iris_dt[Species=="setosa",Sepal.Length], iris_dt[Species=="setosa",Sepal.Width], method="spearman")
+
+cor.test(iris_dt[Species=="versicolor",Sepal.Length], iris_dt[Species=="versicolor",Sepal.Width], method="pearson")
+cor.test(iris_dt[Species=="versicolor",Sepal.Length], iris_dt[Species=="versicolor",Sepal.Width], method="spearman")
+
+cor.test(iris_dt[Species=="virginica",Sepal.Length], iris_dt[Species=="virginica",Sepal.Width], method="pearson")
+cor.test(iris_dt[Species=="virginica",Sepal.Length], iris_dt[Species=="virginica",Sepal.Width], method="spearman")
+```
+```{r}
+# iris_dt[, cor.test(Sepal.Length, Sepal.Width, method="spearman"), by=Species]
+iris_dt[, cor.test(Sepal.Length, Sepal.Width, method="pearson"), by=Species]
+```
+
 
