@@ -203,3 +203,58 @@ cor.test(exam_dt$attendance, exam_dt$achieved_points, method = "spearman")
 # spearman more robust against outliers 
 ```
 
+
+
+Section 05 - Let’s do a test
+1. Consider the dataset mtcars. Which statistical test that we studied do you suggest to test the association
+between the variable cylinder > 4 and the variable gear > 3? Justify the choice of the test and provide
+the two-sided p-value rounded to two significant digits using signif(...,digits=2)
+```{r}
+data(mtcars)
+mtcars_dt <- as.data.table(mtcars)
+
+a <- as.numeric(count(mtcars_dt[cyl <= 4 & gear <= 3]))
+b <- as.numeric(count(mtcars_dt[cyl > 4 & gear <= 3]))
+c <- as.numeric(count(mtcars_dt[cyl <= 4 & gear > 3]))
+d <- as.numeric(count(mtcars_dt[cyl > 4 & gear > 3]))
+
+cont_dt <- data.table(
+  gear = c(a,b),
+  no_gear = c(c,d)
+)
+
+fisher.test(cont_dt)
+signif(fisher.test(cont_dt)$p.value, digits=2)
+```
+
+2. Assume that α = 0.05 is our threshold of significance. What did we show in part (1) of this exercise?
+We can reject the null hyopthesis (cars with more than 4 cylinders do not associate with cars with more than 3 gears)
+Reject that there is no association between the two variables
+
+
+3. If (1) had asked us to “test if there is a positive association between the variable cylinder > 4 and the
+variable gear > 3”, how would our answer change? What do we conclude?
+```{r}
+fisher.test(cont_dt)
+signif(fisher.test(cont_dt, alternative = "greater")$p.value, digits=2)
+```
+We cannot reject the null hypothesis, that the two variables have a no positive association
+We do not find evidence of a positive association
+
+4. If (1) had additionally specified “do not make any assumption of normality”, how would our answer
+change?
+The result would not have changed. Normality of the data is not relevant for the fischer exact test
+
+
+
+
+
+
+
+
+
+
+
+
+
+
