@@ -247,7 +247,67 @@ The result would not have changed. Normality of the data is not relevant for the
 
 
 
+# Section 06 - Test the association between markers
+In this exercise, we will explore the impact of genetic linkage. See https://www.khanacademy.org/science/ap-
+biology/heredity/non-mendelian-genetics/a/linkage-mapping for an introduction.
 
+1. Make a function that given any two markers, returns the P -value of the appropriate statistical test to
+evaluate the association between the markers. Test your function for, e.g., mrk_1 vs mrk_13314.
+```{r}
+
+marker_test <- function(mrk1, mrk2) {
+  markers <- spread(genotype[marker %in% c(mrk1, mrk2)], marker, genotype)
+  markers_table <- table(markers[, 2:3])
+  
+  as.numeric(fisher.test(markers_table)$p.value)
+}
+marker_test("mrk_1", "mrk_13314")
+```
+
+2. Test the association of every other marker with marker mrk_1.
+```{r}
+markers_list <- marker[id!="mrk_1",id]
+p_vals <- sapply(markers_list, marker_test, mrk2="mrk_1")
+p_vals
+```
+
+
+3. Plot the P -values versus the genomic position of the associated marker. Use -log10(pval), as this
+accentuates small P -values. What do you observe? (Hint: note that marker mrk_1 1 is located at the very
+beginning of Chromosome 1)
+```{r}
+p_vals <- as.data.frame(p_vals)
+p_vals$id <- rownames(p_vals)
+p_vals
+
+markers_extended <- merge(marker[id!="mrk_1"], p_vals, by = "id")
+markers_extended$log10pvalue <- -log10(markers_extended$p_vals)
+markers_extended
+
+ggplot(markers_extended, aes(start, log10pvalue)) +
+  geom_point() +
+  facet_wrap(~chrom, scales = "free_x")
+
+
+```
+4. Plot the histogram of P -values, for (a) markers situated on chromosome 1 and (b) markers situated on
+any other chromosome.
+```{r}
+markers_extended$ischr1 <- markers_extended$chrom == "chr01"
+
+ggplot(markers_extended, aes(log10pvalue, fill=ischr1)) +
+  geom_histogram(alpha=.5) +
+  facet_wrap(~ischr1, scales = "free")
+```
+
+
+5. Compute the fraction of P -values which are smaller or equal to 0.05, for (a) markers situated on chromo-
+some 1 and (b) markers situated on any other chromosome. What do you observe?
+```{r}
+markers_extended_dt <- as.data.table(markers_extended)
+count(markers_extended_dt[ischr1==T & p_vals < 0.05]) / count(markers_extended_dt[ischr1==T]) 
+count(markers_extended_dt[ischr1==F & p_vals < 0.05]) / count(markers_extended_dt[ischr1==F]) 
+```
 
 
 
