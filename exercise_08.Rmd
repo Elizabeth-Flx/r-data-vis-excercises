@@ -152,3 +152,54 @@ iris_dt[, cor.test(Sepal.Length, Sepal.Width, method="pearson"), by=Species]
 ```
 
 
+
+# Section 04 - Pitfalls when data deviates from the assumption of normality
+1. The file stats-pitfalls.csv contains simulated data that will help us analyze how the t-test can fail. Load
+and visualize the data. Apply both the t-test and Wilcoxon test on it. What do you observe? Which test is
+the better choice here?
+Hint: use stat_summary() or geom_vline() to add points/lines to the ggplot object.
+```{r}
+pitfalls_dt <- fread("extdata/stats-pitfalls.csv")
+pitfalls_dt
+
+pitfalls_long <- melt(pitfalls_dt, measure.vars = c("group1", "group2"))
+pitfalls_long
+
+ggplot(pitfalls_long, aes(value, fill=variable)) +
+  geom_histogram(alpha=.5, position="identity") +
+  geom_vline(aes(xintercept=mean(pitfalls_dt[,group1]), color="mean")) +
+  geom_vline(aes(xintercept=mean(pitfalls_dt[,group2]), color="mean")) +
+  geom_vline(aes(xintercept=median(pitfalls_dt[,group1]), color="median")) +
+  geom_vline(aes(xintercept=median(pitfalls_dt[,group2]), color="median")) 
+
+# t test compares means (as it assumes distibution is normal)
+t.test(pitfalls_dt[,group1], pitfalls_dt[,group2], var.equal=F)
+#t.test(pitfalls_dt[,group1], pitfalls_dt[,group2], var.equal=F)
+
+# wilcoxon can account for non normal distibution, does not look at mean only
+# can take different medians into account
+wilcox.test(pitfalls_dt[,group1], pitfalls_dt[,group2])
+```
+
+2. In dataviz land, we want to know whether there is correlation between attendance to the exercise
+sessions and the points achieved in the final exam. We provide simulated data below. Load the data
+from exam_correlation.tsv. Calculate the correlation between attendance and points using Pearson and
+Spearman methods and visualize it. Some students will drop out of the distribution since they were planning
+to take the retake exam and skipped the first exam, thus obtaining a grade of zero. Which correlation
+method should be preferred in this context and why?
+```{r}
+exam_dt <- fread("extdata/exam_correlation.tsv")
+exam_dt
+
+ggplot(exam_dt, aes(attendance, achieved_points)) +
+  geom_point() +
+  geom_smooth(aes(color="non_linear")) +
+  geom_smooth(method="lm", aes(color="linear"))
+
+cor.test(exam_dt$attendance, exam_dt$achieved_points, method = "pearson")
+cor.test(exam_dt$attendance, exam_dt$achieved_points, method = "spearman")
+
+# spearman does not take outliers into account as much as pearson (best way would be to filter out the 0s)
+# spearman more robust against outliers 
+```
+
