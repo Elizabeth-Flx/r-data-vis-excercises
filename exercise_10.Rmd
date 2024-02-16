@@ -12,7 +12,93 @@ library(cowplot)
 
 
 
+# Section 01 - Linear regression for Predicting Heights
 
+To start, read the provided heights dataset using the following line of code (it’s your own heights data):
+```{r}
+heights <- fread("extdata/height.csv") %>% na.omit() %>%
+.[, sex:=as.factor(toupper(sex))]
+heights$sex <- replace(heights$sex, heights$sex =='W', 'F')
+heights
+```
+
+1. Predict each student’s height, given their sex and their parents heights.
+```{r}
+fit <- lm(height ~ sex + mother + father, data=heights)
+summary(fit)
+```
+
+2. Check the plot of the residual vs the predicted values and the Q-Q plot of the residuals. Do these plots
+provide evidence against the assumptions of linear regression?
+```{r}
+prediction <- data.table(prediction = predict(fit), residuals = residuals(fit))
+
+ggplot(prediction, aes(prediction, residuals)) +
+  geom_point() +
+  geom_smooth()
+
+qqnorm(residuals(fit))
+qqline(residuals(fit))
+```
+
+3. Let’s focus on one sex. Fit a linear model for each male’s height given the father’s height. Then, fit another
+linear model for the father’s height given each male’s height.
+```{r}
+fit_m_f <- lm(height ~ father, data = heights[sex=="M"])
+fit_f_m <- lm(father ~ height, data = heights[sex=="M"])
+
+summary(fit_m_f)
+summary(fit_f_m)
+```
+
+4. Predict each male student’s height given the father’s height (predict()) and predict each father’s height
+given each male student’s height. Store both predictions into new columns of a data table. Then, plot the
+original data and additionally both regression lines. Hint: use geom_line.
+```{r}
+male_heights <- heights[sex=="M"]
+
+male_heights[, male_predicted := predict(fit_m_f, male_heights[, "father"]) ]
+male_heights[, father_predicted := predict(fit_f_m, male_heights[, "height"]) ]
+
+male_heights
+
+ggplot(male_heights) +
+  geom_point(aes(father, male_predicted, color="prediction")) +
+  geom_point(aes(father, height, color="true")) +
+  geom_abline(intercept = fit_m_f$coefficients[1], slope = fit_m_f$coefficients[2])
+
+ggplot(male_heights) +
+  geom_point(aes(height, father_predicted, color="prediction")) +
+  geom_point(aes(height, father, color="true")) +
+  geom_abline(intercept = fit_f_m$coefficients[1], slope = fit_f_m$coefficients[2])
+
+ggplot(male_heights) +
+  geom_point(aes(father, height)) +
+  geom_line(aes(father_predicted, height, color="father_pred")) +
+  geom_line(aes(father, male_predicted, color="height_pred"))
+```
+
+5. Additionally, run a PCA on the same subset of the data and plot the first principal component line into
+the same figure. Hint: you can get the unit vector of the first principal component by accessing the loadings
+attribute of the object obtained from princomp. Given this unit vector compute the slope and intercept and
+use geom_abline to plot the resulting line. Remember that the slope, m, of a line can be calculated from
+the coordinates (ux, uy ) of its unit vector, m = uy
+ux and recall that the principal component line contains the
+center of the data. Use geom_abline to plot the line from the computed intercept and slope.
+```{r}
+pca_obj <- princomp(male_heights[, .(height, father)])
+slope <- pca_obj$loadings["height","Comp.1"] / pca_obj$loadings["father","Comp.1"]
+intercept <- pca_obj$center['height'] - pca_obj$center['father'] * slope
+
+ggplot(male_heights) +
+  geom_point(aes(father, height)) +
+  geom_line(aes(father_predicted, height, color="father_pred")) +
+  geom_line(aes(father, male_predicted, color="height_pred")) +
+  geom_abline(aes(intercept = intercept, slope = slope, color="PC1"))
+```
+
+6. Interpret the plot from above. How can we explain the different slopes of the two linear models and the
+pca?
 
 
 
