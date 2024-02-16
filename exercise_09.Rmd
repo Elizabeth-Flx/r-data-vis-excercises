@@ -1,0 +1,10 @@
+# Section 00 - Getting ready
+1. Make sure you have already installed and loaded the following libraries:
+```{r}
+library(ggplot2)
+library(data.table)
+library(magrittr)
+library(tidyr)
+library(dplyr)
+library(patchwork)
+```
