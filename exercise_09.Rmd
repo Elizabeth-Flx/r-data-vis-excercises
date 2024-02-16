@@ -18,3 +18,98 @@ setnames(marker, "id", "marker")
 genotype <- genotype %>%
 melt(id.vars = "strain", variable.name = "marker", value.name = "genotype")
 ```
+
+#Section 01 - Quantile-Quantile plots
+We will simulate some data from different distributions and will compare their quantile-quantile plots.
+
+1. We will use a standard normal (μ = 0 and σ2 = 1) distribution as a reference set. Please simulate 100
+draws from a standard normal distribution. Add them as a column to a data table and plot a histogram of
+these values. Next, use ggplot to create a QQ-plot comparing the expected against the observed quantiles.
+Use geom_abline to draw a line on the QQ-plot where the data should be if the observed and expected
+quantiles match exactly. (Do not mind warnings, if any).
+Hint 1: Set the x and y limits to [-6,6] where appropriate.
+Hint 2: A small reminder of the R functions to simulate a normal distribution:
+```{r}
+set.seed(10)
+# rnorm allows you to draw random values from a normal distribution
+rnorm(10) # 10 random draws
+# pnorm gives the cumulative probability from a normal
+# i.e. pnorm(x) = p(X < x) where X is the random variable
+pnorm(0)
+# qnorm returns the quantiles of a normal distribution
+# it is the inverse of pnorm
+# i.e. given a probability p,
+# it finds x so that pnorm(x) = p
+qnorm(0.5)
+# qnorm can be used to find different types of quantiles
+qnorm(seq(0.25,0.75,0.25)) # quartiles of the normal
+qnorm(seq(0.1,0.9,0.1)) # deciles of the normal
+```
+
+```{r}
+set.seed(42)
+
+values <- data.table(
+  norm = rnorm(100)
+)
+values
+
+ggplot(values, aes(norm)) + 
+  geom_histogram()
+
+quantiles <- c(.25, .5, .75)
+quantiles <- seq(.1, .9, .1)
+
+ggplot(data.table(
+  y = quantile(values$norm, quantiles),
+  x = sapply(quantiles, qnorm)), 
+  aes(x, y)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6) 
+
+ggplot(values, aes(sample=norm)) + 
+  geom_qq(distribution = stats::qnorm) +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6) 
+```
+
+2. Now add a normal distribution with μ = 4 to your data.table and plot the Q-Q plot. How did it change?
+```{r}
+values$norm_shift <- rnorm(100, mean = 4)
+
+ggplot(data.table(
+  y = quantile(values$norm_shift, quantiles),
+  x = sapply(quantiles, qnorm)), 
+  aes(x, y)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6)
+
+ggplot(values, aes(sample=norm_shift)) + 
+  geom_qq(distribution = stats::qnorm) +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6) 
+```
+
+3. How would you tweak the distribution so that you get the following Q-Q plot?
+```{r}
+# larger standard deviation
+values$norm_squash <- rnorm(100, sd = 4)
+
+ggplot(data.table(
+  y = quantile(values$norm_squash, quantiles),
+  x = sapply(quantiles, qnorm)), 
+  aes(x, y)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6)
+
+ggplot(values, aes(sample=norm_squash)) + 
+  geom_qq(distribution = stats::qnorm) +
+  geom_abline(intercept=0, slope=1) +
+  xlim(-6, 6) 
+```
+
+
+
