@@ -249,8 +249,88 @@ plot_pval(pvals_table$BH, title = "BH")
 
 
 
+# Section 05 - sample size and power
+
+1. We will now simulate data under the alternative hypothesis H1 : μx̸ = μy . Specifically, we simulate two
+samples x1, ..., xn and y1, ..., yn where X and Y follow the normal distribution with μx = 0 and μy = 0.5
+respectively. Do N = 1, 000 experiments and investigate the effect of different sample sizes n (10, 100, 1000)
+on the P -value plots. Discuss.
+```{r}
+pvals_10 <- simulate_norm_groups(sample_size = 10, N_experiments = 1000, mu_x = 0, mu_y = 0.5)
+pvals_100 <- simulate_norm_groups(sample_size = 100, N_experiments = 1000, mu_x = 0, mu_y = 0.5)
+pvals_1000 <- simulate_norm_groups(sample_size = 1000, N_experiments = 1000, mu_x = 0, mu_y = 0.5)
+
+plot_pval(pvals_10)
+plot_pval(pvals_100)
+plot_pval(pvals_1000)
+```
+The more observations you have, the lower the pvalue gets
+Small deviations are noticable with enough observations
+
+2. P -values for a mixture of null and alternative.
+Provide the same plots as before when considering a dataset of N0 = 10000 data points simulated under H0
+(true null) and N1 = 1000 data points simulated under H1 (false null). Discuss. You can also use a -log10
+transformation, as in the tutorial, to better visualize the lower end of P -values. The following function will
+allow us to plot the -log10 transformed P -values in a QQ-plot:
+```{r}
+plot_pval_log10 <- function(pvals, title="p val distribution"){
+  n <- length(pvals)
+  dt <- data.table(
+    observed = -log10(sort(pvals)),
+    expected = -log10(ppoints(n, a=0))
+  )
+  ggplot(dt) +
+    geom_point(aes(expected, observed)) +
+    geom_abline(intercept = 0, slope = 1)
+}
+
+pvals_H0 <- simulate_norm_groups(sample_size = 50, N_experiments = 10000)
+pvals_H1 <- simulate_norm_groups(sample_size = 50, N_experiments = 1000, mu_x = 0, mu_y = 0.5)
+
+plot_pval(c(pvals_H0, pvals_H1))
+plot_pval_log10(c(pvals_H0, pvals_H1))
+```
+3. Mixture of H0 and H1 adjusted for multiple testing
+Adjust the p-values with Benjamini-Hochberg (FDR) in the mixture from the previous question. Make a
+contingency table of true positives, true negatives, false positives and false negatives. Try this with different
+sample sizes for FDR = 0.05. Discuss.
+Do the same thing for the bonferroni correction and compare the results
+Hint: You can use the following function for this analysis:
+```{r}
+error_analysis <- function(method='BH', sample_size=50, cut=0.05){
+  pvals <- c(
+    simulate_norm_groups(sample_size = sample_size, N_experiments = 10000),
+    simulate_norm_groups(sample_size = sample_size, N_experiments = 1000, mu_y=0.5)
+  )
+  names(pvals) <- rep(c("H0", "H1"), c(10000, 1000))
+  pvals_adj <- p.adjust(pvals, method=method)
+  table(ifelse(pvals_adj < cut, "significant", "not significant"), names(pvals))
+}
+```
 
 
+```{r}
+sample_size <- 10
+error_analysis(sample_size = sample_size, method="BH")
+error_analysis(sample_size = sample_size, method="bonferroni")
+```
+
+```{r}
+sample_size <- 100
+error_analysis(sample_size = sample_size, method="BH")
+error_analysis(sample_size = sample_size, method="bonferroni")
+```
+
+```{r}
+sample_size <- 1000
+error_analysis(sample_size = sample_size, method="BH")
+error_analysis(sample_size = sample_size, method="bonferroni")
+```
+
+bonferroni has significantly less false positives but therefore more false negatives
+BH has less false negatives but more false positives
+
+Unless sample size is massive (their tradeoffs are less noticable with more observations)
 
 
 
