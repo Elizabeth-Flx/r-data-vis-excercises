@@ -127,7 +127,17 @@ Hint: plot P -values in -log10 scale. Use ppoints(pval, a=0) to generate the exp
 to the uniform distribution, i.e. 1/(n + 1), . . . , n/(n + 1). Note that this is similar to using geom_qq and then
 log-scaling the axes, except that we want to log-scale and also reverse.
 ```{r}
+# we first need to merge the genotype and the growth rate tables.
+genotype_growth <- merge(genotype, growth_rate, by = 'strain')
+# We can then execute the test for each marker inside a data.table function and extract the p-values.
+test_res <- genotype_growth[, .(pval=wilcox.test(YPMalt ~ genotype)$p.value), by='marker']
+ggplot(test_res, aes(pval)) + geom_histogram(boundary = TRUE, bins=50)
 
+ppoints(test_res$pval, a=0)
+
+ggplot(test_res[order(pval)], aes(-log10(ppoints(pval, a=0)), -log10(pval))) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 
@@ -137,8 +147,19 @@ chromosome.
 Hint: plot P -values in -log10 scale. Use the start column from the marker table as position. Additionally,
 facet on the chrom column (because the start column indicates the genomic position of the marker within
 its particular chromosome).
+```{r}
+ggplot(merge(test_res, marker, by = "marker"), aes(start, -log10(pval), color=chrom)) +
+  geom_point() +
+  facet_wrap(~chrom, scales = "free_x")
+```
 
 3. How many markers significantly associate with growth before and after correcting for multiple testing?
+```{r}
+test_res[, padj := p.adjust(pval, method="BH")]
+
+test_res[pval < 0.05, .N]
+test_res[padj < 0.05, .N]
+```
 
 
 
