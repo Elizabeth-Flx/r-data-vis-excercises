@@ -113,3 +113,66 @@ ggplot(values, aes(sample=norm_squash)) +
 
 
 
+# Section 02 - QTL mapping of growth
+For the next questions, we will use the yeast dataset.
+
+1. Test for markers associated with growth.
+Report genetic markers significantly associating with growth rate in maltose. We would like the expected
+ratio of false discoveries among the reported significant markers to not exceed 5%.
+To do so, run a Wilcoxon test for growth rate versus the genotype at each of the 1,000 markers. Remember
+that we tested this relationship for one specific marker last time. Plot a histogram and a Q-Q plot of the
+obtained P -values. Which ones would you consider significant and why? Do we need to correct for multiple
+testing?
+Hint: plot P -values in -log10 scale. Use ppoints(pval, a=0) to generate the expected quantiles according
+to the uniform distribution, i.e. 1/(n + 1), . . . , n/(n + 1). Note that this is similar to using geom_qq and then
+log-scaling the axes, except that we want to log-scale and also reverse.
+```{r}
+
+```
+
+
+2. Plot the P -values against genomic position. Do you see positions that are associated with growth? The
+genomic position is defined by the chromosome the marker is on and the marker’s position within that
+chromosome.
+Hint: plot P -values in -log10 scale. Use the start column from the marker table as position. Additionally,
+facet on the chrom column (because the start column indicates the genomic position of the marker within
+its particular chromosome).
+
+3. How many markers significantly associate with growth before and after correcting for multiple testing?
+
+
+
+# Section 03 - Let’s do many tests
+1. Consider the dataset mtcars. Find all pairs of quantitative variables that show significant association (at
+the 5% level) with each other. Do not make any assumptions of distribution.
+Hint: for a solution that does not use for-loops, use combn and apply.
+```{r}
+data(mtcars)
+mtcars <- data.table(mtcars)
+
+combinations <- combn(colnames(mtcars), m=2)
+
+t(combinations)
+
+calc_cor_pval <- function(x) {
+  v1 <- t(combinations)[x,1]
+  v2 <- t(combinations)[x,2]
+  
+  print(v1)
+  print(v2)
+  
+  cor(mtcars[, ..v1], mtcars[, ..v2], method = "spearman")$p.value
+}
+
+
+
+sapply(1:ncol(combinations), calc_cor_pval)
+
+```
+
+2. Now ensure that, on average, less than 5% of the significant associations you find are false positives.
+3. Now ensure that the probability of having 1 or more false positives is less than 5%
+
+
+
+
