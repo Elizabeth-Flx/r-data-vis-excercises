@@ -8,3 +8,13 @@ library(tidyr)
 library(dplyr)
 library(patchwork)
 ```
+
+2. Load yeast data and required packages using the following code:
+```{r}
+genotype <-fread("extdata/eqtl/genotype.txt")
+growth_rate <-fread("extdata/eqtl/growth.txt")
+marker <-fread("extdata/eqtl/marker.txt")
+setnames(marker, "id", "marker")
+genotype <- genotype %>%
+melt(id.vars = "strain", variable.name = "marker", value.name = "genotype")
+```
