@@ -102,6 +102,60 @@ pca?
 
 
 
+Section 02 - Adjusting for confounding variables - Yeast QTL
+Recall the yeast QTL dataset from the previous exercises and lecture. In particular, we consider once again
+the question: Does marker 5091 still associate with growth in maltose when conditioned on marker 5211?
+Here is the plot of the data:
+
+```{r}
+eqtl_dir <- "extdata/eqtl"
+
+growth <- fread(file.path(eqtl_dir, "growth.txt"))
+growth <- growth %>% melt(id.vars="strain", variable.name='media', value.name='growth_rate')
+growth <- growth[media=="YPMalt"]
+genotype <- fread(file.path(eqtl_dir, "genotype.txt"))
+genotype <- genotype[, .(strain, mrk_5211, mrk_5091)]
+head(genotype)
+## strain mrk_5211 mrk_5091
+## 1: seg_01B Lab strain Lab strain
+## 2: seg_01C Lab strain Lab strain
+## 3: seg_01D Wild isolate Wild isolate
+## 4: seg_02B Lab strain Wild isolate
+## 5: seg_02C Lab strain Lab strain
+## 6: seg_02D Wild isolate Lab strain
+head(growth)
+## strain media growth_rate
+## 1: seg_01B YPMalt 6.720447
+## 2: seg_01C YPMalt 7.429273
+## 3: seg_01D YPMalt 6.905589
+## 4: seg_02B YPMalt 4.924324
+## 5: seg_02C YPMalt 4.413402
+## 6: seg_02D YPMalt 7.926200
+```
+1. Run a linear model predicting the growth given the genotypes of both markers and interpret the result.
+Call this model full.
+```{r}
+merged <- merge(genotype, growth, by = "strain")
+
+full <- lm(growth_rate ~ mrk_5211 + mrk_5091, data = merged)
+summary(full)
+```
+
+
+2. Create a reduced model that only depends on the genotype of mrk_5211. Then run ANOVA to compare
+the full and the reduced model. Suppose that all the assumptions of linear regression hold. What do you
+conclude?
+Does not seem like the growth rate depends on mrk 5091 
+
+## Ho: adding the genotype information of mrk_5091 does not improve the model.
+## note: observe the probability under the null hypothesis of an F statistic as
+## extreme as the one observed here is rather high (> 0.05) so we would not
+## reject the null hypothesis.
+```{r}
+reduced <- lm(growth_rate ~ mrk_5211, data = merged)
+
+anova(full, reduced)
+```
 
 
 
