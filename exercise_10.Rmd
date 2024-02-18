@@ -145,6 +145,7 @@ summary(full)
 2. Create a reduced model that only depends on the genotype of mrk_5211. Then run ANOVA to compare
 the full and the reduced model. Suppose that all the assumptions of linear regression hold. What do you
 conclude?
+
 Does not seem like the growth rate depends on mrk 5091 
 
 ## Ho: adding the genotype information of mrk_5091 does not improve the model.
@@ -154,7 +155,7 @@ Does not seem like the growth rate depends on mrk 5091
 ```{r}
 reduced <- lm(growth_rate ~ mrk_5211, data = merged)
 
-anova(full, reduced)
+anova(reduced, full)
 ```
 
 
