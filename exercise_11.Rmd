@@ -122,7 +122,7 @@ tpr_fpr <- function(dt, score_column, labels_column, threshold){
 }
 
 thresholds <- c(-1, 0, 1)
-thresholds <- seq(-10, 10, .1)
+thresholds <- seq(-5, 5, .01)
 
 points <- lapply(thresholds, function(t) {
   tpr_fpr(diabetes_dt, "prediction", "Outcome", t)
@@ -134,10 +134,74 @@ ggplot(rbindlist(points), aes(fpr, tpr, label=t)) +
   geom_point() +
   xlim(0,1) +
   ylim(0,1)
-
 ```
 
 
+# Homework
+
+1. Create two further logistic regression models as in section 1.3 for predicting Outcome. For one model, use
+only the feature variable BloodPressure for building the model. For the other model, use only the feature
+variable Insulin. Which models have a significant feature?
+```{r}
+g_fit <- glm(Outcome ~ Glucose, data=diabetes_dt, family = "binomial")
+b_fit <- glm(Outcome ~ BloodPressure, data=diabetes_dt, family = "binomial")
+i_fit <- glm(Outcome ~ Insulin, data=diabetes_dt, family = "binomial")
+
+exp(coef(g_fit)[2]) 
+exp(coef(b_fit)[2])
+exp(coef(i_fit)[2])
+```
+
+2. Collect the predictions of each model for all samples in the dataset. Store the scores of each model in a
+separate column of the original dataset. Visualize the distributions of the scores with an appropriate plot.
+Which type of distribution would you ideally expect? Hint: Use the predict() function.
+```{r}
+diabetes_dt[, g_prediction := predict(g_fit, data=Glucose)]
+diabetes_dt[, b_prediction := predict(b_fit, data=BloodPressure)]
+diabetes_dt[, i_prediction := predict(i_fit, data=Insulin)]
+
+diabetes_dt
+
+ggplot(diabetes_dt, aes(g_prediction, fill=Outcome)) + geom_histogram(position = "dodge")
+ggplot(diabetes_dt, aes(b_prediction, fill=Outcome)) + geom_histogram(position = "dodge")
+ggplot(diabetes_dt, aes(i_prediction, fill=Outcome)) + geom_histogram(position = "dodge")
+```
+
+3. For a systematic comparison of the previously built three models, plot a ROC curve for each model into a
+single plot using the function geom_roc from the library plotROC. Add the area under the curve (AUC) to
+the plot. Which is the best model according to the AUC?
+```{r}
+melted <- melt(diabetes_dt, measure.vars = c("g_prediction", "b_prediction", "i_prediction"), variable.name = "predictor", value.name = "response")
+
+ggplot(melted, aes(d=as.numeric(Outcome), m=response, color=predictor)) +
+  geom_roc() +
+  geom_abline(intercept = 0, slope = 1)
+
+
+
+
+```
+
+4. Now, fit a logistic regression model with all feature variables (stored in feature_vars). Visualize the
+distribution of the predicted scores for positive and negative classes. What can you conclude from this
+visualization regarding the separation of the two classes by the model? Plot once again the previous ROC
+curves and include the ROC curve of the full model for comparison.
+```{r}
+full_fit <- glm(c("Outcome ~ ", paste(colnames(diabetes_dt[,1:8]), collapse = " + ") ), data=diabetes_dt, family = "binomial")
+full_fit
+```
+
+```{r}
+diabetes_dt[, full_prediction := predict(full_fit)]
+
+melted <- melt(diabetes_dt, measure.vars = c("g_prediction", "b_prediction", "i_prediction", "full_prediction"), variable.name = "predictor", value.name = "response")
+
+ggplot(melted, aes(d=as.numeric(Outcome), m=response, color=predictor)) +
+  geom_roc() +
+  geom_abline(intercept = 0, slope = 1)
+
+
+```
 
 
 
