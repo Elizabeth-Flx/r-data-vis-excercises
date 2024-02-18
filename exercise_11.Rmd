@@ -25,25 +25,80 @@ feature_vars <- colnames(diabetes_dt[,-c("Outcome")])
 diabetes_dt
 ```
 1. How balanced are the classes of the diabetes dataset?
+```{r}
+diabetes_dt[, .N, by=Outcome]
+```
 
 2. Create an appropriate plot to visualize the relationship between the Outcome variable and the feature
 variables Glucose, BloodPressure and Insulin. What do you conclude from your visualization?
+```{r}
+ggplot(diabetes_dt, aes(Glucose, Outcome)) +
+  geom_violin() +
+  geom_boxplot(width=.2)
+
+ggplot(diabetes_dt, aes(BloodPressure, Outcome)) +
+  geom_violin() +
+  geom_boxplot(width=.2)
+
+ggplot(diabetes_dt, aes(Insulin, Outcome)) +
+  geom_violin() +
+  geom_boxplot(width=.2)
+```
 
 3. Fit a logistic regression model for predicting Outcome only based on the feature Glucose. Inspect the
 coefficients of the model’s predictors. According to the model, how much do the odds of getting diabetes
 increase upon increasing the blood glucose level by 1 mg/dL?
+```{r}
+glucose_fit <- glm(Outcome ~ Glucose, data=diabetes_dt, family = "binomial")
+glucose_fit
+
+coef(glucose_fit)
+
+exp(coef(glucose_fit)[2])
+```
+increase in 1 mg/dL associates with an increase of around 4% of the odds of getting diabetes
 
 4. Collect the predictions for the model from above for all samples in the dataset. Store the scores in a new
 column of the original dataset. Visualize the distributions of the scores with an appropriate plot. Which type
-of distribution would you ideally expect? Hint: Use the predict() function.
+of distribution would you ideally expect? Hint: Use the predict() function. (normal)
+```{r}
+diabetes_dt
+
+diabetes_dt[, prediction := predict(glucose_fit, data=diabetes_dt$Glucose)]
+
+ggplot(diabetes_dt, aes(prediction)) +
+  geom_histogram()
+
+ggplot(diabetes_dt, aes(prediction, fill=Outcome)) +
+  geom_histogram(position = "dodge")
+```
+
 
 5. Now, create a function for computing the confusion matrix based on the predicted scores of a model and
 the actual outcome. The function takes as input a threshold, a data table, the name of a scores column and
 the name of column with the actual labels. Then, use the implemented function for computing the confusion
 matrix of the model for the thresholds -1, 0 and 1. Are there any differences? What is the amount of false
-positives for the last cutoff? You can use the following definition of the function:
+positives for the last cutoff? (11) You can use the following definition of the function:
 ```{r}
-confusion_matrix <- function(dt, score_column, labels_column, threshold){ }
+confusion_matrix <- function(dt, score_column, labels_column, threshold){
+  
+  t_neg <- dt[get(labels_column)==0 & get(score_column) < threshold, .N]
+  f_pos <- dt[get(labels_column)==0 & get(score_column) >= threshold, .N]
+  f_neg <- dt[get(labels_column)==1 & get(score_column) < threshold, .N]
+  t_pos <- dt[get(labels_column)==1 & get(score_column) >= threshold, .N]
+  
+  
+  conf_mat <- data.frame(
+    negative_label = c(t_neg,f_pos),
+    positive_label = c(f_neg,t_pos)
+  ) 
+  rownames(conf_mat) <- c("negative_prediction", "positive_prediction")
+  conf_mat
+}
+
+confusion_matrix(diabetes_dt, "prediction", "Outcome", -1)
+confusion_matrix(diabetes_dt, "prediction", "Outcome", 0)
+confusion_matrix(diabetes_dt, "prediction", "Outcome", 1)
 ```
 
 6. Use the implemented function to create a second function for this time computing the TPR and FPR for
@@ -52,10 +107,34 @@ What is the TPR and the FPR of the first model for the thresholds -1, 0 and 1? P
 plot. Your function should take the same parameters as before and return a data table as follows:
 ```{r}
 tpr_fpr <- function(dt, score_column, labels_column, threshold){
-tpr <- NULL # TODO
-fpr <- NULL # TODO
-return(data.table(tpr=tpr, fpr=fpr, t=threshold))
+  
+  cm <- confusion_matrix(dt, score_column, labels_column, threshold)
+  
+  tn <- cm["negative_prediction", "negative_label"]
+  fn <- cm["negative_prediction", "positive_label"]
+  tp <- cm["positive_prediction", "positive_label"]
+  fp <- cm["positive_prediction", "negative_label"]
+  
+  tpr <- tp / (tp+fn)
+  fpr <- fp / (tn+fp)
+  
+  return(data.table(tpr=tpr, fpr=fpr, t=threshold))
 }
+
+thresholds <- c(-1, 0, 1)
+thresholds <- seq(-10, 10, .1)
+
+points <- lapply(thresholds, function(t) {
+  tpr_fpr(diabetes_dt, "prediction", "Outcome", t)
+})
+
+rbindlist(points)
+
+ggplot(rbindlist(points), aes(fpr, tpr, label=t)) +
+  geom_point() +
+  xlim(0,1) +
+  ylim(0,1)
+
 ```
 
 
