@@ -1,0 +1,65 @@
+# Section 00 - Getting ready
+1. Make sure you have already installed and loaded the following libraries:
+```{r}
+library(ggplot2)
+library(data.table)
+library(magrittr)
+library(tidyr)
+library(ggrepel)
+library(plotROC)
+```
+
+
+
+# Section 01 - Logistic regression on Diabetes dataset
+
+In this section we are considering the dataset pima-indians-diabetes.csv which is originally from the
+National Institute of Diabetes and Digestive and Kidney Diseases. A more detailed description of the data
+can be obtained from Kaggle: https://www.kaggle.com/uciml/pima-indians-diabetes-database.
+Load the dataset with the following lines of code:
+```{r}
+diabetes_dt <- fread("extdata/pima-indians-diabetes.csv")
+diabetes_dt[, Outcome := as.factor(Outcome)]
+# Store feature variables that we will need for later
+feature_vars <- colnames(diabetes_dt[,-c("Outcome")])
+diabetes_dt
+```
+1. How balanced are the classes of the diabetes dataset?
+
+2. Create an appropriate plot to visualize the relationship between the Outcome variable and the feature
+variables Glucose, BloodPressure and Insulin. What do you conclude from your visualization?
+
+3. Fit a logistic regression model for predicting Outcome only based on the feature Glucose. Inspect the
+coefficients of the model’s predictors. According to the model, how much do the odds of getting diabetes
+increase upon increasing the blood glucose level by 1 mg/dL?
+
+4. Collect the predictions for the model from above for all samples in the dataset. Store the scores in a new
+column of the original dataset. Visualize the distributions of the scores with an appropriate plot. Which type
+of distribution would you ideally expect? Hint: Use the predict() function.
+
+5. Now, create a function for computing the confusion matrix based on the predicted scores of a model and
+the actual outcome. The function takes as input a threshold, a data table, the name of a scores column and
+the name of column with the actual labels. Then, use the implemented function for computing the confusion
+matrix of the model for the thresholds -1, 0 and 1. Are there any differences? What is the amount of false
+positives for the last cutoff? You can use the following definition of the function:
+```{r}
+confusion_matrix <- function(dt, score_column, labels_column, threshold){ }
+```
+
+6. Use the implemented function to create a second function for this time computing the TPR and FPR for
+a certain threshold of a classification model given the predicted scores of a model and the actual outcome.
+What is the TPR and the FPR of the first model for the thresholds -1, 0 and 1? Plot these values in a scatter
+plot. Your function should take the same parameters as before and return a data table as follows:
+```{r}
+tpr_fpr <- function(dt, score_column, labels_column, threshold){
+tpr <- NULL # TODO
+fpr <- NULL # TODO
+return(data.table(tpr=tpr, fpr=fpr, t=threshold))
+}
+```
+
+
+
+
+
+
